@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23a855f7'/><text y='72' x='50' text-anchor='middle' font-size='70' fill='white'>✦</text></svg>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Re:ゼロから始める異世界生活 チェックリスト</title>
 <style>
@@ -386,11 +387,25 @@
   .share-modal-btns .btn-xpost:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.22); }
 
   @media (max-width: 600px) {
-    .tab { padding: 7px 11px; font-size: 0.73rem; }
-    .btn { padding: 8px 13px; font-size: 0.77rem; }
-    .section-header { padding: 11px 14px; }
-    .section-body { padding: 11px 14px; }
-  }
+  #app { padding: 10px; }
+  header { padding: 18px 16px 14px; border-radius: 16px; }
+  header h1 { font-size: 1rem; }
+  .subtitle { font-size: 0.72rem; }
+  .tab { padding: 6px 10px; font-size: 0.7rem; }
+  .tabs { gap: 5px; }
+  .btn { padding: 7px 11px; font-size: 0.73rem; gap: 4px; }
+  .action-row { gap: 7px; }
+  .section-header { padding: 10px 12px; flex-direction: column; align-items: flex-start; }
+  .section-body { padding: 10px 12px; }
+  .check-item { padding: 6px 6px; }
+  .check-label { font-size: 0.82rem; }
+  .check-sublabel { font-size: 0.72rem; }
+  .section-title { font-size: 0.85rem; }
+  .global-progress { padding: 12px 14px; }
+  .share-modal-content { padding: 18px 14px; border-radius: 16px; }
+  .share-modal-btns { flex-direction: column; }
+  .share-modal-btns button { width: 100%; }
+}
 </style>
 </head>
 <body>
@@ -1055,273 +1070,292 @@ function getCategoryStats() {
 function generateShareCanvas() {
   const canvas = document.getElementById('share-canvas');
   const W = 1200, H = 630;
-  canvas.width = W;
-  canvas.height = H;
+  canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // ── 背景：深夜の星空グラデーション ──
-  const bgGrad = ctx.createRadialGradient(W*0.4, H*0.3, 0, W*0.5, H*0.5, W*0.85);
-  bgGrad.addColorStop(0,   '#1a0d3d');
-  bgGrad.addColorStop(0.4, '#0d0628');
-  bgGrad.addColorStop(0.8, '#08041a');
-  bgGrad.addColorStop(1,   '#020109');
-  ctx.fillStyle = bgGrad;
+  // ── 背景：ラベンダーグラデーション ──
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#e2ccf5');
+  bg.addColorStop(0.5, '#edd8fa');
+  bg.addColorStop(1, '#f5e2f8');
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  // ── 星（細かい無数の星） ──
-  const rng = (seed) => { let x = Math.sin(seed) * 43758; return x - Math.floor(x); };
-  for (let i = 0; i < 220; i++) {
-    const x = rng(i * 3.1) * W;
-    const y = rng(i * 7.9) * H;
-    const r = rng(i * 1.7) * 1.8 + 0.3;
-    const alpha = rng(i * 5.3) * 0.7 + 0.3;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-    ctx.fill();
+  // ── ドット柄オーバーレイ ──
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  for (let row = 0; row < 20; row++) {
+    for (let col = 0; col < 30; col++) {
+      ctx.beginPath();
+      ctx.arc(col * 44 + (row % 2 === 0 ? 0 : 22), row * 36, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
-  // ── キラキラ大きめの星（十字スパークル） ──
-  function drawSparkle(cx, cy, size, color) {
+  // ── オレンジ斜線（太いリボン）──
+  function drawStripe(ctx, x1, y1, x2, y2, width, color) {
     ctx.save();
-    ctx.translate(cx, cy);
-    ctx.fillStyle = color;
-    ctx.shadowBlur = 18;
-    ctx.shadowColor = color;
-    for (let ang = 0; ang < Math.PI * 2; ang += Math.PI / 2) {
-      ctx.save();
-      ctx.rotate(ang);
-      ctx.beginPath();
-      ctx.moveTo(0, -size);
-      ctx.quadraticCurveTo(size * 0.15, -size * 0.15, 0, 0);
-      ctx.quadraticCurveTo(-size * 0.15, -size * 0.15, 0, -size);
-      ctx.fill();
-      ctx.restore();
-    }
-    // 中心点
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.arc(0, 0, size * 0.18, 0, Math.PI * 2);
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  // オレンジリボン群（左下→右上）
+  drawStripe(ctx, -80, 520, 480, -80, 130, 'rgba(255,160,50,0.75)');
+  drawStripe(ctx, 60, 650, 600, 40, 70, 'rgba(255,140,30,0.55)');
+  drawStripe(ctx, 200, 680, 700, 80, 40, 'rgba(255,170,60,0.4)');
+  // 右上オレンジ
+  drawStripe(ctx, 700, -50, 1300, 400, 120, 'rgba(255,160,50,0.65)');
+  drawStripe(ctx, 850, -80, 1350, 350, 60, 'rgba(255,145,35,0.45)');
+
+  // ── 紫アクセント斜線 ──
+  drawStripe(ctx, -50, 380, 300, -50, 55, 'rgba(160,80,230,0.45)');
+  drawStripe(ctx, 1000, 680, 1300, 200, 80, 'rgba(140,70,210,0.38)');
+
+  // ── 白い4pointed星（スパークル）──
+  function draw4Star(ctx, cx, cy, size, alpha) {
+    ctx.save();
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.shadowBlur = size * 1.5;
+    ctx.shadowColor = `rgba(255,255,255,${alpha * 0.8})`;
+    ctx.translate(cx, cy);
+    const arms = 4;
+    ctx.beginPath();
+    for (let i = 0; i < arms * 2; i++) {
+      const ang = (Math.PI * 2 / (arms * 2)) * i - Math.PI / 2;
+      const r = i % 2 === 0 ? size : size * 0.15;
+      if (i === 0) ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r);
+      else ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
+    }
+    ctx.closePath();
     ctx.fill();
     ctx.restore();
   }
-
-  const sparkles = [
-    [90, 60, 22, '#ffe4f7'], [1110, 80, 18, '#c8b4ff'],
-    [55, 280, 14, '#ffd6f0'], [1140, 320, 16, '#b8d4ff'],
-    [160, 500, 19, '#ffcce8'], [1060, 510, 13, '#d4c8ff'],
-    [320, 40, 11, '#fff0fb'], [880, 30, 15, '#e8d4ff'],
-    [600, 580, 12, '#ffddf5'], [420, 590, 10, '#c4dcff'],
-    [740, 55, 17, '#ffe8fa'], [230, 200, 9, '#ddd0ff'],
-    [970, 180, 10, '#ffd0ec'],
+  const stars = [
+    [490, 60, 38, 0.95], [300, 140, 22, 0.85], [600, 30, 16, 0.8],
+    [80, 200, 28, 0.9], [150, 80, 14, 0.75], [1060, 80, 32, 0.9],
+    [920, 170, 18, 0.8], [1140, 250, 24, 0.85], [50, 450, 20, 0.8],
+    [1080, 520, 30, 0.9], [700, 580, 16, 0.75], [380, 570, 20, 0.8],
+    [820, 40, 14, 0.7], [180, 540, 12, 0.7],
   ];
-  sparkles.forEach(([x,y,s,c]) => drawSparkle(x, y, s, c));
+  stars.forEach(([x, y, s, a]) => draw4Star(ctx, x, y, s, a));
 
-  // ── 輝くオーブ（背景の光） ──
-  function drawGlow(cx, cy, r, color) {
-    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    g.addColorStop(0, color);
-    g.addColorStop(1, 'transparent');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  drawGlow(200,  150, 180, 'rgba(140,60,210,0.18)');
-  drawGlow(1000, 480, 200, 'rgba(80,120,255,0.14)');
-  drawGlow(600,  315, 260, 'rgba(200,100,255,0.07)');
-  drawGlow(950,  100, 140, 'rgba(255,180,220,0.10)');
-
-  // ── 中央カード（半透明ガラス） ──
-  const cX = W/2, cY = H/2;
-  const cW = 880, cH = 480;
+  // ── 中央白カード ──
+  const cX = W / 2, cY = H / 2 + 20;
+  const cW = 820, cH = 420;
   ctx.save();
-  ctx.shadowBlur = 60;
-  ctx.shadowColor = 'rgba(180,100,255,0.35)';
-  const cardGrad = ctx.createLinearGradient(cX - cW/2, cY - cH/2, cX + cW/2, cY + cH/2);
-  cardGrad.addColorStop(0, 'rgba(255,255,255,0.10)');
-  cardGrad.addColorStop(1, 'rgba(180,130,255,0.06)');
-  ctx.fillStyle = cardGrad;
+  ctx.shadowBlur = 40;
+  ctx.shadowColor = 'rgba(160,80,230,0.2)';
+  ctx.fillStyle = 'rgba(255,255,255,0.72)';
   ctx.beginPath();
-  ctx.roundRect(cX - cW/2, cY - cH/2, cW, cH, 32);
+  ctx.roundRect(cX - cW/2, cY - cH/2, cW, cH, 28);
   ctx.fill();
   ctx.restore();
 
-  // カード枠線（グラデーション）
+  // カード縁
   ctx.save();
-  const borderGrad = ctx.createLinearGradient(cX - cW/2, cY - cH/2, cX + cW/2, cY + cH/2);
-  borderGrad.addColorStop(0,   'rgba(255,200,240,0.6)');
-  borderGrad.addColorStop(0.5, 'rgba(200,160,255,0.5)');
-  borderGrad.addColorStop(1,   'rgba(160,200,255,0.4)');
-  ctx.strokeStyle = borderGrad;
-  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(200,160,240,0.6)';
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.roundRect(cX - cW/2, cY - cH/2, cW, cH, 32);
+  ctx.roundRect(cX - cW/2, cY - cH/2, cW, cH, 28);
   ctx.stroke();
   ctx.restore();
 
-  // ── タイトル ──
+  // ── 上部タイトルエリア ──
+  // 「リゼロ」大文字
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.shadowBlur = 20;
-  ctx.shadowColor = 'rgba(220,160,255,0.9)';
-  const titleGrad = ctx.createLinearGradient(cX - 250, 0, cX + 250, 0);
-  titleGrad.addColorStop(0,   '#ffd6f0');
-  titleGrad.addColorStop(0.5, '#e8c8ff');
-  titleGrad.addColorStop(1,   '#c8dcff');
-  ctx.fillStyle = titleGrad;
-  ctx.font = 'bold 38px "Hiragino Sans", "Meiryo", sans-serif';
-  ctx.fillText('✦  ' + LANG[currentLang].canvasTitle + '  ✦', cX, 188);
+  ctx.font = 'bold 82px "Arial Rounded MT Bold", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif';
+  // 白縁取り
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+  ctx.lineWidth = 10;
+  ctx.lineJoin = 'round';
+  ctx.strokeText('リゼロ', cX, 120);
+  // 紫文字
+  const tGrad = ctx.createLinearGradient(cX - 200, 60, cX + 200, 130);
+  tGrad.addColorStop(0, '#a040e0');
+  tGrad.addColorStop(1, '#7020b0');
+  ctx.fillStyle = tGrad;
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = 'rgba(160,60,220,0.4)';
+  ctx.fillText('リゼロ', cX, 120);
   ctx.restore();
 
-  // ── 区切りライン（グロウライン） ──
+  // サブタイトル
   ctx.save();
-  ctx.shadowBlur = 12;
-  ctx.shadowColor = 'rgba(220,180,255,0.8)';
-  const lineGrad = ctx.createLinearGradient(cX-380, 0, cX+380, 0);
-  lineGrad.addColorStop(0,   'transparent');
-  lineGrad.addColorStop(0.2, 'rgba(220,180,255,0.6)');
-  lineGrad.addColorStop(0.8, 'rgba(180,210,255,0.6)');
-  lineGrad.addColorStop(1,   'transparent');
-  ctx.strokeStyle = lineGrad;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(cX - 380, 210);
-  ctx.lineTo(cX + 380, 210);
-  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.font = 'bold 17px "Hiragino Sans", sans-serif';
+  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+  ctx.lineWidth = 4;
+  ctx.lineJoin = 'round';
+  ctx.strokeText('-STARTING LIFE IN ANOTHER WORLD-', cX, 152);
+  ctx.fillStyle = '#8020c0';
+  ctx.fillText('-STARTING LIFE IN ANOTHER WORLD-', cX, 152);
   ctx.restore();
 
-  // ── コンプリート率（メイン） ──
+  // ── 達成率 ──
   const done  = parseInt(document.getElementById('global-done').textContent)  || 0;
   const total = parseInt(document.getElementById('global-total').textContent) || 0;
   const pct   = total ? Math.round(done / total * 100) : 0;
 
-  // 「あなたのリゼロコンプリート率は」
+  // 「コンプリート率」ラベル
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = 'rgba(240,220,255,0.85)';
-  ctx.font = '22px "Hiragino Sans", "Meiryo", sans-serif';
-  ctx.fillText(LANG[currentLang].canvasSubtitle, cX, 255);
+  ctx.font = '20px "Hiragino Sans", sans-serif';
+  ctx.fillStyle = '#9030d0';
+  ctx.fillText(currentLang === 'en' ? 'Completion Rate' : 'コンプリート率', cX, cY - 130);
   ctx.restore();
 
-  // 大きなパーセント数字
+  // 大きな % 数字
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.shadowBlur = 40;
-  ctx.shadowColor = '#ff8fd4';
-  const pctGrad = ctx.createLinearGradient(cX - 100, 280, cX + 100, 340);
-  pctGrad.addColorStop(0,   '#ffe0f5');
-  pctGrad.addColorStop(0.4, '#ffaadf');
-  pctGrad.addColorStop(0.7, '#e080ff');
-  pctGrad.addColorStop(1,   '#a8c8ff');
-  ctx.fillStyle = pctGrad;
-  ctx.font = 'bold 100px "Hiragino Sans", "Meiryo", sans-serif';
-  ctx.fillText(pct + '%', cX, 345);
+  ctx.font = 'bold 110px "Arial Rounded MT Bold", "Hiragino Maru Gothic ProN", sans-serif';
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
+  ctx.lineWidth = 12;
+  ctx.lineJoin = 'round';
+  ctx.strokeText(pct + '%', cX, cY - 20);
+  const pGrad = ctx.createLinearGradient(cX - 100, cY - 130, cX + 100, cY - 20);
+  pGrad.addColorStop(0, '#c060f0');
+  pGrad.addColorStop(0.5, '#9030d0');
+  pGrad.addColorStop(1, '#6010a0');
+  ctx.fillStyle = pGrad;
+  ctx.shadowBlur = 20;
+  ctx.shadowColor = 'rgba(160,60,220,0.35)';
+  ctx.fillText(pct + '%', cX, cY - 20);
   ctx.restore();
 
-  // 「です ✦」
+  // 達成数
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.shadowBlur = 15;
-  ctx.shadowColor = 'rgba(220,160,255,0.8)';
-  ctx.fillStyle = 'rgba(240,220,255,0.85)';
-  ctx.font = '22px "Hiragino Sans", "Meiryo", sans-serif';
-  ctx.fillText('★  ' + done + ' / ' + total + ' ' + LANG[currentLang].canvasItems + '  ★', cX, 380);
+  ctx.font = 'bold 18px "Hiragino Sans", sans-serif';
+  ctx.fillStyle = '#8028b8';
+  ctx.fillText('★ ' + done + ' / ' + total + (currentLang === 'en' ? ' items' : ' 項目達成') + ' ★', cX, cY + 20);
   ctx.restore();
 
-  // ── カテゴリ別プログレス（コンパクト版） ──
+  // ── カテゴリ別バー ──
   const cats = getCategoryStats();
-  const colW = cW / Math.ceil(cats.length / 2);
-  const barColors = [
-    ['#e080ff','#ff8fd4'],['#80c8ff','#8fffda'],
-    ['#ffb3e0','#ffddaa'],['#b3e0ff','#c8b4ff'],
-    ['#ff9fd4','#ffd4aa'],['#90d4ff','#b4ffee'],
-    ['#f0a0ff','#ffa0c0'],
-  ];
-  const rows = [0,1,2,3];
-  const rowsB = [4,5,6,7].slice(0, Math.max(0, cats.length - 4));
-  const allRows = [rows, rowsB].filter(r => r.length > 0);
+  const cols = 2;
+  const rows = Math.ceil(cats.length / cols);
+  const bTop = cY + 45;
+  const bH = 16;
+  const colWide = (cW - 60) / cols;
+  const barColors = ['#c060f0','#f06090','#60b0f0','#f09030','#60d090','#f060c0','#9090f0'];
 
-  ctx.save();
   cats.forEach((cat, i) => {
-    const col = Math.floor(i / Math.ceil(cats.length / 2));
-    const row = i % Math.ceil(cats.length / 2);
-    const rowCount = Math.ceil(cats.length / 2);
-    const xBase = (cX - cW/2 + 30) + col * (cW / 2 - 20) + (col > 0 ? 20 : 0);
-    const yBase = 410 + row * ((H - 440 - 60) / rowCount);
-
-    const bW = cW / 2 - 60;
-    const bH = 16;
-    const [c1, c2] = barColors[i % barColors.length];
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const xBase = cX - cW/2 + 30 + col * colWide;
+    const yBase = bTop + row * (bH + 22) + bH;
+    const bW = colWide - 20;
+    const color = barColors[i % barColors.length];
 
     // ラベル
-    ctx.fillStyle = 'rgba(240,225,255,0.9)';
-    ctx.font = '14px "Hiragino Sans","Meiryo",sans-serif';
+    ctx.save();
+    ctx.fillStyle = '#6a1b9a';
+    ctx.font = '13px "Hiragino Sans", sans-serif';
     ctx.textAlign = 'left';
-    ctx.shadowBlur = 0;
-    ctx.fillText(cat.label, xBase, yBase - 2);
-
-    // パーセント
+    ctx.fillText(cat.label, xBase, yBase - 3);
+    // %
     ctx.textAlign = 'right';
-    ctx.fillStyle = 'rgba(255,210,240,0.95)';
-    ctx.font = 'bold 14px sans-serif';
-    ctx.fillText(cat.pct + '%', xBase + bW, yBase - 2);
+    ctx.font = 'bold 13px "Hiragino Sans", sans-serif';
+    ctx.fillStyle = '#9030d0';
+    ctx.fillText(cat.pct + '%', xBase + bW, yBase - 3);
+    ctx.restore();
 
     // バー背景
-    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillStyle = 'rgba(200,160,230,0.25)';
     ctx.beginPath();
-    ctx.roundRect(xBase, yBase + 4, bW, bH, bH/2);
+    ctx.roundRect(xBase, yBase + 1, bW, bH, bH/2);
     ctx.fill();
 
-    // バー塗り
+    // バー
     if (cat.pct > 0) {
       const fw = Math.max(bW * cat.pct / 100, bH);
-      const bg = ctx.createLinearGradient(xBase, 0, xBase + fw, 0);
-      bg.addColorStop(0, c1 + 'cc');
-      bg.addColorStop(1, c2 + 'cc');
-      ctx.fillStyle = bg;
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = c1;
+      const bg2 = ctx.createLinearGradient(xBase, 0, xBase + fw, 0);
+      bg2.addColorStop(0, color + 'bb');
+      bg2.addColorStop(1, color + '77');
+      ctx.save();
+      ctx.fillStyle = bg2;
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = color + '66';
       ctx.beginPath();
-      ctx.roundRect(xBase, yBase + 4, fw, bH, bH/2);
+      ctx.roundRect(xBase, yBase + 1, fw, bH, bH/2);
       ctx.fill();
-      ctx.shadowBlur = 0;
+      ctx.restore();
     }
   });
-  ctx.restore();
 
-  // ── 下部：URLとハッシュタグ ──
+  // ── 下部：URL＋ハッシュタグ ──
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.fillStyle = 'rgba(200,180,255,0.55)';
-  ctx.font = '14px sans-serif';
-  const shortUrl = location.href.length > 60
-    ? location.href.slice(0, 57) + '...'
-    : location.href;
-  ctx.fillText('🔗 ' + shortUrl + '  #リゼロ #ReZero', cX, H - 22);
+  ctx.font = '13px sans-serif';
+  ctx.fillStyle = 'rgba(120,60,180,0.65)';
+  const shortUrl = location.href.length > 55 ? location.href.slice(0, 52) + '...' : location.href;
+  ctx.fillText('🔗 ' + shortUrl + '  #リゼロ #rezero', cX, H - 18);
   ctx.restore();
 
   return canvas;
 }
-
 function shareToX() {
   const canvas = generateShareCanvas();
   const preview = document.getElementById('share-canvas-preview');
   preview.src = canvas.toDataURL('image/png');
 
-  const done = document.getElementById('global-done').textContent;
+  const done  = document.getElementById('global-done').textContent;
   const total = document.getElementById('global-total').textContent;
-  const pct = total > 0 ? Math.round(parseInt(done) / parseInt(total) * 100) : 0;
-  const tweetBody = currentLang === 'ja'
-    ? 'リゼロ既読チェックリスト達成率 ' + pct + '%（' + done + '/' + total + '）\n▶ ' + location.href + '\n#リゼロ #rezero'
-    : 'Re:Zero Checklist ' + pct + '% (' + done + '/' + total + ')\n▶ ' + location.href + '\n#ReZero #rezero';
-  const tweetText = encodeURIComponent(tweetBody);
+  const pct   = total > 0 ? Math.round(parseInt(done) / parseInt(total) * 100) : 0;
+  const tweetBody = currentLang === 'en'
+    ? 'Re:Zero Checklist ' + pct + '% complete (' + done + '/' + total + ')\n'
+    : 'リゼロ既読チェック ' + pct + '%達成（' + done + '/' + total + '）\n';
+  const tweetText = tweetBody + location.href + '\n#リゼロ #rezero';
+
+  // ダウンロードボタン
+  const dlBtn = document.getElementById('modal-btn-dl');
+  if (dlBtn) {
+    dlBtn.onclick = () => {
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'rezero_checklist.png';
+      a.click();
+    };
+  }
+
+  // Xで投稿ボタン（モバイル: Web Share API / デスクトップ: 画像DL+X intent）
   const xBtn = document.getElementById('share-modal-xbtn');
-  xBtn.onclick = () => window.open('https://x.com/intent/tweet?text=' + tweetText, '_blank');
+  if (xBtn) {
+    xBtn.onclick = async () => {
+      // モバイルでWeb Share API（ファイル共有）を試みる
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'rezero_checklist.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], text: tweetText, title: 'リゼロ既読チェックリスト' });
+            return;
+          } catch (e) { /* fallthrough */ }
+        }
+        // フォールバック：画像DL + クリップボードコピー + X を開く
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'rezero_checklist.png';
+        a.click();
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(tweetText).catch(() => {});
+        }
+        setTimeout(() => {
+          window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(tweetText), '_blank');
+          showToast(currentLang === 'en'
+            ? '📥 Image downloaded! Attach it to your tweet ✨'
+            : '📥 画像をダウンロードしました！ツイートに添付してください ✨');
+        }, 600);
+      });
+    };
+  }
 
   document.getElementById('share-modal-overlay').classList.add('open');
 }
-
 function closeShareModal() {
   document.getElementById('share-modal-overlay').classList.remove('open');
 }
