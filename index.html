@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Re:ゼロから始める異世界生活 チェックリスト</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+    min-height: 100vh;
+    background-color: #e8d5f0;
+    background-image:
+      linear-gradient(135deg, rgba(155,95,192,0.4) 25%, transparent 25%),
+      linear-gradient(225deg, rgba(155,95,192,0.4) 25%, transparent 25%),
+      linear-gradient(315deg, rgba(155,95,192,0.4) 25%, transparent 25%),
+      linear-gradient(45deg,  rgba(155,95,192,0.4) 25%, transparent 25%);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 0, 30px -30px, 0 30px;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(135deg, transparent 35%, rgba(220,180,240,0.35) 35%, rgba(220,180,240,0.35) 65%, transparent 65%),
+      linear-gradient(45deg,  transparent 35%, rgba(200,160,230,0.25) 35%, rgba(200,160,230,0.25) 65%, transparent 65%);
+    background-size: 120px 120px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #app {
+    position: relative;
+    z-index: 1;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  header {
+    background: linear-gradient(135deg, #6a1b9a 0%, #9c27b0 40%, #ba68c8 75%, #f48fb1 100%);
+    border-radius: 24px;
+    padding: 28px 32px 22px;
+    margin-bottom: 18px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(100,27,154,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+    border: 2px solid rgba(255,255,255,0.25);
+  }
+  header h1 {
+    color: #fff;
+    font-size: clamp(1.05rem, 3.8vw, 1.65rem);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 8px rgba(60,0,80,0.45);
+  }
+  .header-top {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+  }
+  #lang-toggle {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+  }
+  #lang-toggle:hover { background: rgba(255,255,255,0.25); }
+  header .subtitle {
+    color: rgba(255,255,255,0.88);
+    font-size: 0.82rem;
+    margin-top: 5px;
+  }
+  header .update-date {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.72rem;
+    margin-top: 4px;
+  }
+
+  .global-progress {
+    background: rgba(255,255,255,0.9);
+    border-radius: 20px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(150,80,200,0.18);
+    border: 1.5px solid rgba(186,104,200,0.4);
+  }
+  .gp-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #6a1b9a;
+    font-size: 0.95rem;
+  }
+  .gp-count { font-size: 1.1rem; color: #9c27b0; }
+  .bar-track {
+    background: #ede0f5;
+    border-radius: 99px;
+    height: 14px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #9c27b0, #e040fb, #f48fb1);
+    transition: width 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .action-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .btn {
+    border: none;
+    border-radius: 50px;
+    padding: 9px 18px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.22); }
+  .btn:active { transform: translateY(0); }
+  .btn-x { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; }
+  .btn-copy { background: linear-gradient(135deg, #8e24aa, #ba68c8); color: #fff; }
+  .btn-reset { background: linear-gradient(135deg, #555, #888); color: #fff; }
+
+  .btn-small {
+    background: rgba(186,104,200,0.15);
+    color: #6a1b9a;
+    border: 1.5px solid rgba(186,104,200,0.5);
+    padding: 4px 10px;
+    font-size: 0.73rem;
+    border-radius: 50px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-small:hover { background: rgba(186,104,200,0.3); }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .tab {
+    background: rgba(255,255,255,0.75);
+    border: 2px solid rgba(186,104,200,0.45);
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: 0.79rem;
+    font-weight: 700;
+    color: #7b1fa2;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab:hover { background: rgba(186,104,200,0.22); }
+  .tab.active {
+    background: linear-gradient(135deg, #8e24aa, #ce93d8);
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(142,36,170,0.38);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .section-card {
+    background: rgba(255,255,255,0.93);
+    border-radius: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 16px rgba(150,80,200,0.13);
+    border: 1.5px solid rgba(206,147,216,0.35);
+    overflow: hidden;
+  }
+  .section-header {
+    background: linear-gradient(135deg, #f3e5f5, #fce4ec);
+    padding: 13px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .section-title {
+    font-size: 0.93rem;
+    font-weight: 800;
+    color: #6a1b9a;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .section-controls {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .section-progress-text {
+    font-size: 0.77rem;
+    color: #8e24aa;
+    font-weight: 600;
+  }
+  .section-body { padding: 13px 18px; }
+  .section-bar {
+    height: 6px;
+    background: #f3e5f5;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .section-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #ab47bc, #e040fb, #f48fb1);
+    transition: width 0.4s;
+  }
+
+  .check-list { list-style: none; display: flex; flex-direction: column; gap: 3px; }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .check-item:hover { background: rgba(186,104,200,0.1); }
+  .check-item.checked { background: rgba(255,215,0,0.12); }
+  .check-box {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid #ce93d8;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: all 0.2s;
+    font-size: 0.82rem;
+    line-height: 1;
+  }
+  .check-item.checked .check-box {
+    background: linear-gradient(135deg, #f0c030, #ffe082);
+    border-color: #f9a825;
+    box-shadow: 0 2px 6px rgba(249,168,37,0.4);
+    color: #f57f17;
+  }
+  .check-label { font-size: 0.86rem; color: #424242; line-height: 1.45; }
+  .check-item.checked .check-label {
+    color: #a17010;
+    text-decoration: line-through;
+    text-decoration-color: #d4a030;
+  }
+  .check-sublabel {
+    font-size: 0.75rem;
+    color: #ab47bc;
+    display: block;
+    margin-top: 1px;
+  }
+  .check-item.checked .check-sublabel { color: #c68c30; }
+
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    background: linear-gradient(135deg, #6a1b9a, #ba68c8);
+    color: #fff;
+    padding: 10px 26px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 6px 20px rgba(106,27,154,0.45);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+    z-index: 9999;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Share Modal */
+  #share-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+  }
+  #share-modal-overlay.open {
+    display: flex;
+  }
+  #share-modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 700px;
+    width: calc(100% - 32px);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.35);
+    position: relative;
+  }
+  #share-modal h2 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #6a1b9a;
+    margin-bottom: 14px;
+    text-align: center;
+  }
+  #share-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #888;
+    line-height: 1;
+  }
+  #share-modal-close:hover { color: #333; }
+  #share-canvas-preview {
+    width: 100%;
+    border-radius: 10px;
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid #e0d0f0;
+  }
+  .share-modal-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .share-modal-btns .btn-dl {
+    background: linear-gradient(135deg, #6a1b9a, #ba68c8);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 22px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    transition: all 0.2s;
+  }
+  .share-modal-btns .btn-dl:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.22); }
+  .share-modal-btns .btn-xpost {
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 22px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    transition: all 0.2s;
+  }
+  .share-modal-btns .btn-xpost:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,0,0,0.22); }
+
+  @media (max-width: 600px) {
+    .tab { padding: 7px 11px; font-size: 0.73rem; }
+    .btn { padding: 8px 13px; font-size: 0.77rem; }
+    .section-header { padding: 11px 14px; }
+    .section-body { padding: 11px 14px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="header-top">
+      <button id="lang-toggle" onclick="toggleLang()">🇺🇸 EN</button>
+    </div>
+    <h1 id="site-title">✨ Re:ゼロから始める異世界生活 ✨</h1>
+    <p class="subtitle">Total Checklist — Lost in Memories Style 💜</p>
+    <p class="update-date"><span id="update-label">最終更新日：</span><span id="update-date-val">2026年06月02日</span></p>
+  </header>
+
+  <div class="global-progress">
+    <div class="gp-label">
+      <span>🌟 <span id="gp-label-text">総合達成率</span></span>
+      <span class="gp-count"><span id="global-done">0</span> / <span id="global-total">0</span></span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="global-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn btn-x" id="btn-share-x" onclick="shareToX()">𝕏 Xでシェア</button>
+    <button class="btn btn-copy" id="btn-copy-url" onclick="copyURL()">🔗 URLをコピー</button>
+    <button class="btn btn-reset" id="btn-reset" onclick="resetAll()">🗑️ リセット</button>
+  </div>
+
+  <div class="tabs" id="tab-bar"></div>
+  <div id="panels"></div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Share Modal -->
+<div id="share-modal-overlay">
+  <div id="share-modal">
+    <button id="share-modal-close" onclick="closeShareModal()">×</button>
+    <h2 id="modal-title">📤 シェア画像</h2>
+    <canvas id="share-canvas" style="display:none"></canvas>
+    <img id="share-canvas-preview" src="" alt="シェア画像プレビュー" />
+    <div class="share-modal-btns">
+      <button class="btn-dl" id="modal-btn-dl" onclick="downloadShareImage()">📥 ダウンロード</button>
+      <button class="btn-xpost" id="share-modal-xbtn">𝕏 Xで投稿する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ↓ 更新したときにここの日付を変更してください
+const SITE_UPDATE_DATE = '2026年06月02日';
+
+// ─── 多言語辞書 ───
+const LANG = {
+  ja: {
+    siteTitle: 'Re:ゼロ 既読・視聴チェックリスト',
+    updateLabel: '最終更新日：',
+    copyUrl: '🔗 URLをコピー',
+    shareX: '𝕏 Xでシェア',
+    copiedMsg: 'URLをコピーしました！',
+    globalProgress: '総合達成率',
+    checkAll: '全選択',
+    uncheckAll: '全解除',
+    modalTitle: 'シェア画像',
+    downloadBtn: '📥 ダウンロード',
+    postX: '𝕏 Xで投稿',
+    closeBtn: '✕ 閉じる',
+    noContent: 'コンテンツなし',
+    tabs: {
+      novel: '📚 書籍版',
+      web:   '🌐 なろう版',
+      ex:    '⚔️ EX',
+      short: '📖 短編・特典',
+      anime: '🎬 アニメ',
+      game:  '🎮 ゲーム',
+    },
+    canvasTitle: 'リゼロ 既読チェックリスト',
+    canvasSubtitle: 'あなたの Re:ゼロ コンプリート率は',
+    canvasItems: '項目達成',
+    categoryLabels: {
+      novel: '書籍版',
+      web: 'なろう版',
+      ex: 'EX',
+      short: '短編・特典',
+      anime: 'アニメ',
+      game: 'ゲーム',
+    },
+  },
+  en: {
+    siteTitle: 'Re:Zero Read/Watch Checklist',
+    updateLabel: 'Last Updated: ',
+    copyUrl: '🔗 Copy URL',
+    shareX: '𝕏 Share on X',
+    copiedMsg: 'URL copied!',
+    globalProgress: 'Overall Progress',
+    checkAll: 'Select All',
+    uncheckAll: 'Deselect All',
+    modalTitle: 'Share Image',
+    downloadBtn: '📥 Download',
+    postX: '𝕏 Post on X',
+    closeBtn: '✕ Close',
+    noContent: 'No content',
+    tabs: {
+      novel: '📚 Novels',
+      web:   '🌐 Web Novel',
+      ex:    '⚔️ EX Series',
+      short: '📖 Short Stories',
+      anime: '🎬 Anime',
+      game:  '🎮 Games',
+    },
+    canvasTitle: 'Re:Zero Checklist',
+    canvasSubtitle: 'Your Re:Zero Completion Rate',
+    canvasItems: 'items completed',
+    categoryLabels: {
+      novel: 'Novels',
+      web: 'Web Novel',
+      ex: 'EX Series',
+      short: 'Short Stories',
+      anime: 'Anime',
+      game: 'Games',
+    },
+  },
+};
+
+let currentLang = localStorage.getItem('rezero_lang') || 'ja';
+
+function toggleLang() {
+  currentLang = currentLang === 'ja' ? 'en' : 'ja';
+  localStorage.setItem('rezero_lang', currentLang);
+  applyLang();
+  buildUI();
+}
+
+function applyLang() {
+  const L = LANG[currentLang];
+  // lang toggle button
+  const langBtn = document.getElementById('lang-toggle');
+  if (langBtn) langBtn.textContent = currentLang === 'ja' ? '🇺🇸 EN' : '🇯🇵 JP';
+  // header
+  const siteTitleEl = document.getElementById('site-title');
+  if (siteTitleEl) siteTitleEl.textContent = '✨ ' + L.siteTitle + ' ✨';
+  // update label
+  const ulEl = document.getElementById('update-label');
+  if (ulEl) ulEl.textContent = L.updateLabel;
+  // global progress
+  const gpEl = document.getElementById('gp-label-text');
+  if (gpEl) gpEl.textContent = L.globalProgress;
+  // action buttons
+  const btnX = document.getElementById('btn-share-x');
+  if (btnX) btnX.textContent = L.shareX;
+  const btnCopy = document.getElementById('btn-copy-url');
+  if (btnCopy) btnCopy.textContent = L.copyUrl;
+  const btnReset = document.getElementById('btn-reset');
+  if (btnReset) btnReset.textContent = currentLang === 'en' ? '🗑️ Reset' : '🗑️ リセット';
+  // modal
+  const mtEl = document.getElementById('modal-title');
+  if (mtEl) mtEl.textContent = '📤 ' + L.modalTitle;
+  const dlEl = document.getElementById('modal-btn-dl');
+  if (dlEl) dlEl.textContent = L.downloadBtn;
+  const xpostEl = document.getElementById('share-modal-xbtn');
+  if (xpostEl) xpostEl.textContent = L.postX;
+}
+
+const TABS = [
+  {
+    id: 'novel',
+    sections: [
+      { id: 's_ch1', title: { ja: '第一章「怒涛の一日目」', en: '第一章「怒涛の一日目」' }, icon: '📗', items: [
+        { id: 'n001', label: '第1巻', sub: '第一章 怒涛の一日目' },
+      ]},
+      { id: 's_ch2', title: { ja: '第二章「激動の一週間」', en: '第二章「激動の一週間」' }, icon: '📗', items: [
+        { id: 'n002', label: '第2巻', sub: '第二章 激動の一週間（前編）' },
+        { id: 'n003', label: '第3巻', sub: '第二章 激動の一週間（後編）' },
+      ]},
+      { id: 's_ch3', title: { ja: '第三章「再来の王都」', en: '第三章「再来の王都」' }, icon: '📗', items: [
+        { id: 'n004', label: '第4巻', sub: '第三章 再来の王都（1）' },
+        { id: 'n005', label: '第5巻', sub: '第三章 再来の王都（2）' },
+        { id: 'n006', label: '第6巻', sub: '第三章 再来の王都（3）' },
+        { id: 'n007', label: '第7巻', sub: '第三章 再来の王都（4）' },
+        { id: 'n008', label: '第8巻', sub: '第三章 再来の王都（5）' },
+        { id: 'n009', label: '第9巻', sub: '第三章 再来の王都（6）' },
+      ]},
+      { id: 's_ch4', title: { ja: '第四章「永遠の契約」', en: '第四章「永遠の契約」' }, icon: '📗', items: [
+        { id: 'n010', label: '第10巻', sub: '第四章 永遠の契約（1）' },
+        { id: 'n011', label: '第11巻', sub: '第四章 永遠の契約（2）' },
+        { id: 'n012', label: '第12巻', sub: '第四章 永遠の契約（3）' },
+        { id: 'n013', label: '第13巻', sub: '第四章 永遠の契約（4）' },
+        { id: 'n014', label: '第14巻', sub: '第四章 永遠の契約（5）' },
+        { id: 'n015', label: '第15巻', sub: '第四章 永遠の契約（6）' },
+      ]},
+      { id: 's_ch5', title: { ja: '第五章「歴史を刻む星々」', en: '第五章「歴史を刻む星々」' }, icon: '📗', items: [
+        { id: 'n016', label: '第16巻', sub: '第五章 歴史を刻む星々（1）' },
+        { id: 'n017', label: '第17巻', sub: '第五章 歴史を刻む星々（2）' },
+        { id: 'n018', label: '第18巻', sub: '第五章 歴史を刻む星々（3）' },
+        { id: 'n019', label: '第19巻', sub: '第五章 歴史を刻む星々（4）' },
+        { id: 'n020', label: '第20巻', sub: '第五章 歴史を刻む星々（5）' },
+      ]},
+      { id: 's_ch6', title: { ja: '第六章「記憶の回廊」', en: '第六章「記憶の回廊」' }, icon: '📗', items: [
+        { id: 'n021', label: '第21巻', sub: '第六章 記憶の回廊（1）' },
+        { id: 'n022', label: '第22巻', sub: '第六章 記憶の回廊（2）' },
+        { id: 'n023', label: '第23巻', sub: '第六章 記憶の回廊（3）' },
+        { id: 'n024', label: '第24巻', sub: '第六章 記憶の回廊（4）' },
+        { id: 'n025', label: '第25巻', sub: '第六章 記憶の回廊（5）' },
+      ]},
+      { id: 's_ch7', title: { ja: '第七章「狼の国」', en: '第七章「狼の国」' }, icon: '📗', items: [
+        { id: 'n026', label: '第26巻', sub: '第七章 狼の国（1）' },
+        { id: 'n027', label: '第27巻', sub: '第七章 狼の国（2）' },
+        { id: 'n028', label: '第28巻', sub: '第七章 狼の国（3）' },
+        { id: 'n029', label: '第29巻', sub: '第七章 狼の国（4）' },
+        { id: 'n030', label: '第30巻', sub: '第七章 狼の国（5）' },
+        { id: 'n031', label: '第31巻', sub: '第七章 狼の国（6）' },
+        { id: 'n032', label: '第32巻', sub: '第七章 狼の国（7）' },
+        { id: 'n033', label: '第33巻', sub: '第七章 狼の国（8）' },
+      ]},
+      { id: 's_ch8', title: { ja: '第八章「ヴィンセント・ヴォラキア」', en: '第八章「ヴィンセント・ヴォラキア」' }, icon: '📗', items: [
+        { id: 'n034', label: '第34巻', sub: '第八章 ヴィンセント・ヴォラキア（1）' },
+        { id: 'n035', label: '第35巻', sub: '第八章 ヴィンセント・ヴォラキア（2）' },
+        { id: 'n036', label: '第36巻', sub: '第八章 ヴィンセント・ヴォラキア（3）' },
+        { id: 'n037', label: '第37巻', sub: '第八章 ヴィンセント・ヴォラキア（4）' },
+        { id: 'n038', label: '第38巻', sub: '第八章 ヴィンセント・ヴォラキア（5）' },
+      ]},
+      { id: 's_ch9', title: { ja: '第九章「名も無き星の光」', en: '第九章「名も無き星の光」' }, icon: '📗', items: [
+        { id: 'n039', label: '第39巻', sub: '第九章 名も無き星の光（1）' },
+        { id: 'n040', label: '第40巻', sub: '第九章 名も無き星の光（2）' },
+        { id: 'n041', label: '第41巻', sub: '第九章 名も無き星の光（3）' },
+        { id: 'n042', label: '第42巻', sub: '第九章 名も無き星の光（4）' },
+        { id: 'n043', label: '第43巻', sub: '第九章 名も無き星の光（終幕）' },
+      ]},
+      { id: 's_ch10', title: { ja: '第十章「獅子王の国」', en: '第十章「獅子王の国」' }, icon: '📗', items: [
+        { id: 'n044', label: '第44巻', sub: '第十章 獅子王の国（1）（連載中）' },
+      ]},
+    ]
+  },
+  {
+    id: 'web',
+    sections: [
+      { id: 'w_main', title: { ja: 'Web小説版（本編）', en: 'Web Novel (Main Story)' }, icon: '💻', items: [
+        { id: 'w001', label: '第一章', sub: '怒涛の一日目' },
+        { id: 'w002', label: '第二章', sub: '激動の一週間' },
+        { id: 'w_wanday1', label: '番外編「わんでい」', sub: '第二章〜第三章間の番外編' },
+        { id: 'w003', label: '第三章', sub: '再来の王都' },
+        { id: 'w004', label: '第四章', sub: '永遠の契約' },
+        { id: 'w_wanday2', label: '番外編「わんでいⅡ」', sub: '第四章〜第五章間の番外編' },
+        { id: 'w005', label: '第五章', sub: '歴史を刻む星々' },
+        { id: 'w006', label: '第六章', sub: '記憶の回廊' },
+        { id: 'w007', label: '第七章', sub: '狼の国' },
+        { id: 'w008', label: '第八章', sub: 'ヴィンセント・ヴォラキア' },
+        { id: 'w009', label: '第九章', sub: '名も無き星の光' },
+        { id: 'w010', label: '第十章', sub: '獅子王の国（連載中）' },
+      ]},
+      { id: 'w_if', title: { ja: 'IFストーリー', en: 'IF Stories' }, icon: '🌀', items: [
+        { id: 'if001', label: 'ナツキ・レム', sub: 'IFストーリー' },
+        { id: 'if002', label: '胡蝶之夢', sub: 'IFストーリー' },
+        { id: 'if003', label: 'ゼロカラカサネルイセカイセイカツ', sub: 'IFストーリー' },
+        { id: 'if004', label: 'ゼロカラアヤマツイセカイセイカツ', sub: 'IFストーリー' },
+        { id: 'if005', label: 'ゼロカラツギハグイセカイセイカツ', sub: 'IFストーリー' },
+        { id: 'if006', label: 'ゼロカラミマガウイセカイセイカツ', sub: 'IFストーリー' },
+        { id: 'if007', label: 'ゼロカラミマガウイセカイセイカツⅡ', sub: 'IFストーリー' },
+        { id: 'if008', label: 'ゼロカラアザムクイセカイセイカツ', sub: 'IFストーリー' },
+        { id: 'if009', label: 'ゼロカラササゲルイセカイセイカツ', sub: 'IFストーリー' },
+        { id: 'if010', label: '学園リゼロ！ 1時間目！', sub: 'IFストーリー' },
+        { id: 'if011', label: '学園リゼロ！ 2時間目！', sub: 'IFストーリー' },
+        { id: 'if012', label: '学園リゼロ！ 3時間目！', sub: 'IFストーリー' },
+        { id: 'if013', label: '学園リゼロ！ 4時間目！', sub: 'IFストーリー' },
+      ]},
+    ]
+  },
+  {
+    id: 'ex',
+    sections: [
+      { id: 'ex_main', title: { ja: 'EXシリーズ', en: 'EX Series' }, icon: '⚔️', items: [
+        { id: 'ex001', label: 'EX1「獅子王の見た夢」', sub: '' },
+        { id: 'ex002', label: 'EX2「剣鬼恋歌」', sub: '' },
+        { id: 'ex003', label: 'EX3「剣鬼恋譚」', sub: '' },
+        { id: 'ex004', label: 'EX4「最優紀行」', sub: '' },
+        { id: 'ex005', label: 'EX5「緋色姫譚」', sub: '' },
+        { id: 'ex006', label: 'EX6「剣鬼戦歌」', sub: '' },
+      ]},
+    ]
+  },
+  {
+    id: 'short',
+    sections: [
+      { id: 'sh_main', title: { ja: '短編集', en: 'Short Story Collection' }, icon: '📄', items: [
+        { id: 'sh001', label: '短編集 第1巻', sub: '' },
+        { id: 'sh002', label: '短編集 第2巻', sub: '' },
+        { id: 'sh003', label: '短編集 第3巻', sub: '' },
+        { id: 'sh004', label: '短編集 第4巻', sub: '' },
+        { id: 'sh005', label: '短編集 第5巻', sub: '' },
+        { id: 'sh006', label: '短編集 第6巻', sub: '' },
+        { id: 'sh007', label: '短編集 第7巻', sub: '' },
+        { id: 'sh008', label: '短編集 第8巻', sub: '' },
+        { id: 'sh009', label: '短編集 第9巻', sub: '' },
+        { id: 'sh010', label: '短編集 第10巻', sub: '' },
+        { id: 'sh011', label: '短編集 第11巻', sub: '' },
+        { id: 'sh012', label: '短編集 第12巻', sub: '' },
+        { id: 'sh013', label: '短編集 第13巻', sub: '' },
+      ]},
+      { id: 'sh_zeropedia', title: { ja: 'Re:zeropedia', en: 'Re:zeropedia' }, icon: '📖', items: [
+        { id: 'zp001', label: 'Re:zeropedia', sub: '' },
+        { id: 'zp002', label: 'Re:zeropedia 2', sub: '' },
+      ]},
+      { id: 'sh_bluray', title: { ja: '円盤特典小説', en: 'Blu-ray Bonus Novels' }, icon: '💿', items: [
+        { id: 'bd001', label: 'Re:ゼロから始める前日譚 氷結の絆', sub: '円盤特典' },
+        { id: 'bd002', label: 'Re:ゼロから始める前日譚 隠れ里の鬼姉妹', sub: '円盤特典' },
+        { id: 'bd003', label: 'Re:ゼロから始める前日譚 陣営結成秘話', sub: '円盤特典' },
+        { id: 'bd004', label: 'Re:IFから始める異世界生活 ナツキ・レム', sub: '円盤特典' },
+        { id: 'bd005', label: 'Re:ゼロから始める前日譚 アポカリプスガールズ', sub: '円盤特典' },
+        { id: 'bd006', label: 'Re:ゼロから始める前日譚 過ぎ去りし日々を愛して', sub: '円盤特典' },
+        { id: 'bd007', label: 'Re:IFから始める異世界生活 ゼロカラカサネルイセカイセイカツ', sub: '円盤特典' },
+        { id: 'bd008', label: "Re:ゼロから始める異世界生活Ex『劇場前善意』", sub: '円盤特典' },
+        { id: 'bd009', label: "Re:ゼロから始める異世界生活Ex『SCORPION TALE』", sub: '円盤特典' },
+        { id: 'bd010', label: 'Re:IFから始める異世界生活 ゼロカラアヤマツイセカイセイカツ', sub: '円盤特典' },
+      ]},
+      { id: 'sh_other', title: { ja: '書籍その他', en: 'Other Books' }, icon: '📦', items: [
+        { id: 'bo001', label: 'Re:ゼロから始める異世界生活 大塚真一郎 Art Works Re：BOX', sub: '' },
+        { id: 'bo002', label: 'Re:ゼロから始める異世界生活 大塚真一郎 Art Works Re：BOX 2nd', sub: '' },
+      ]},
+      { id: 'sh_manga', title: { ja: '漫画', en: 'Manga' }, icon: '📕', items: [
+        { id: 'mg001', label: '第一章 王都の一日編', sub: '漫画版' },
+        { id: 'mg002', label: '第二章 屋敷の一週間編', sub: '漫画版' },
+        { id: 'mg003', label: '第三章 Truth of Zero', sub: '漫画版' },
+        { id: 'mg004', label: '第四章 聖域と強欲の魔女', sub: '漫画版' },
+        { id: 'mg005', label: '第五章 水の都と英雄の詩', sub: '漫画版' },
+        { id: 'mg006', label: '剣鬼恋歌 〜真銘譚〜', sub: '漫画版' },
+        { id: 'mg007', label: '氷結の絆（漫画版）', sub: '漫画版' },
+        { id: 'mg008', label: '公式アンソロジーコミック', sub: '漫画版' },
+      ]},
+    ]
+  },
+  {
+    id: 'anime',
+    sections: [
+      { id: 'a_s1', title: { ja: '第1期（2016年）全25話', en: 'Season 1 (2016) — 25 eps' }, icon: '✨', items: [
+        { id: 'a1_01', label: '第1話（S1-1話）', sub: '始まりの終わりと終わりの始まり' },
+        { id: 'a1_02', label: '第2話（S1-2話）', sub: '再会の魔女' },
+        { id: 'a1_03', label: '第3話（S1-3話）', sub: 'ゼロから始まる異世界生活' },
+        { id: 'a1_04', label: '第4話（S1-4話）', sub: 'ロズワール邸の団欒' },
+        { id: 'a1_05', label: '第5話（S1-5話）', sub: '約束した朝は遠く' },
+        { id: 'a1_06', label: '第6話（S1-6話）', sub: '鎖の音' },
+        { id: 'a1_07', label: '第7話（S1-7話）', sub: 'ナツキ・スバルのリスタート' },
+        { id: 'a1_08', label: '第8話（S1-8話）', sub: '泣いて泣き喚いて泣き止んだから' },
+        { id: 'a1_09', label: '第9話（S1-9話）', sub: '勇気の意味' },
+        { id: 'a1_10', label: '第10話（S1-10話）', sub: '鬼がかったやり方' },
+        { id: 'a1_11', label: '第11話（S1-11話）', sub: 'レム' },
+        { id: 'a_ova_ms', label: 'Memory Snow（OVA）', sub: '劇場版OVA 2018年' },
+        { id: 'a1_12', label: '第12話（S1-12話）', sub: '再来の王都' },
+        { id: 'a1_13', label: '第13話（S1-13話）', sub: '自称騎士ナツキ・スバル' },
+        { id: 'a1_14', label: '第14話（S1-14話）', sub: '絶望という病' },
+        { id: 'a1_15', label: '第15話（S1-15話）', sub: '狂気の外側' },
+        { id: 'a1_16', label: '第16話（S1-16話）', sub: '豚の欲望' },
+        { id: 'a1_17', label: '第17話（S1-17話）', sub: '醜態の果てに' },
+        { id: 'a1_18', label: '第18話（S1-18話）', sub: 'ゼロから' },
+        { id: 'a1_19', label: '第19話（S1-19話）', sub: '白鯨攻略戦' },
+        { id: 'a1_20', label: '第20話（S1-20話）', sub: 'ヴィルヘルム・ヴァン・アストレア' },
+        { id: 'a1_21', label: '第21話（S1-21話）', sub: '絶望に抗う賭け' },
+        { id: 'a1_22', label: '第22話（S1-22話）', sub: '怠惰一閃' },
+        { id: 'a1_23', label: '第23話（S1-23話）', sub: '悪辣なる怠惰' },
+        { id: 'a1_24', label: '第24話（S1-24話）', sub: '自称騎士と最優の騎士' },
+        { id: 'a1_25', label: '第25話（S1-25話）', sub: 'ただそれだけの物語' },
+      ]},
+      { id: 'a_s2', title: { ja: '第2期（2020〜2021年）全25話', en: 'Season 2 (2020-2021) — 25 eps' }, icon: '✨', items: [
+        { id: 'a2_01', label: '第26話（S2-1話）', sub: 'それぞれの誓い' },
+        { id: 'a2_02', label: '第27話（S2-2話）', sub: '次なる場所' },
+        { id: 'a2_03', label: '第28話（S2-3話）', sub: '待ちかねた再会' },
+        { id: 'a2_04', label: '第29話（S2-4話）', sub: '親子' },
+        { id: 'a2_05', label: '第30話（S2-5話）', sub: '踏み出した一歩' },
+        { id: 'a2_06', label: '第31話（S2-6話）', sub: '少女の福音' },
+        { id: 'a2_07', label: '第32話（S2-7話）', sub: 'ユージン' },
+        { id: 'a2_08', label: '第33話（S2-8話）', sub: '命の価値' },
+        { id: 'a2_09', label: '第34話（S2-9話）', sub: 'らぶらぶらぶらぶらぶらぶゆー' },
+        { id: 'a2_10', label: '第35話（S2-10話）', sub: '地獄なら知っている' },
+        { id: 'a2_11', label: '第36話（S2-11話）', sub: '死の味' },
+        { id: 'a2_12', label: '第37話（S2-12話）', sub: '魔女たちの茶会' },
+        { id: 'a2_13', label: '第38話（S2-13話）', sub: '泣きたくなる音' },
+        { id: 'a2_14', label: '第39話（S2-14話）', sub: 'STRAIGHT BET' },
+        { id: 'a2_15', label: '第40話（S2-15話）', sub: 'オットー・スーウェン／信じる理由' },
+        { id: 'a2_16', label: '第41話（S2-16話）', sub: 'クウェインの石は一人じゃ上がらない' },
+        { id: 'a2_17', label: '第42話（S2-17話）', sub: '記憶の旅路' },
+        { id: 'a2_18', label: '第43話（S2-18話）', sub: '平家星の笑った日' },
+        { id: 'a2_19', label: '第44話（S2-19話）', sub: 'エリオール大森林の永久凍土' },
+        { id: 'a2_20', label: '第45話（S2-20話）', sub: '聖域の始まりと、崩壊の始まり' },
+        { id: 'a2_21', label: '第46話（S2-21話）', sub: '咆哮の再会' },
+        { id: 'a2_22', label: '第47話（S2-22話）', sub: '水面に映る幸せ' },
+        { id: 'a2_23', label: '第48話（S2-23話）', sub: '血と臓物まで愛して' },
+        { id: 'a2_24', label: '第49話（S2-24話）', sub: '俺を選べ' },
+        { id: 'a2_25', label: '第50話（S2-25話）', sub: '月下、出鱈目なステップ' },
+      ]},
+      { id: 'a_s3', title: { ja: '第3期（2024年〜）全16話', en: 'Season 3 (2024-) — 16 eps' }, icon: '✨', items: [
+        { id: 'a3_01', label: '第51話（S3-1話）', sub: '劇場型悪意' },
+        { id: 'a3_02', label: '第52話（S3-2話）', sub: '氷炎の結末' },
+        { id: 'a3_03', label: '第53話（S3-3話）', sub: 'ゴージャス・タイガー' },
+        { id: 'a3_04', label: '第54話（S3-4話）', sub: '都市庁舎奪還作戦' },
+        { id: 'a3_05', label: '第55話（S3-5話）', sub: '濁流' },
+        { id: 'a3_06', label: '第56話（S3-6話）', sub: '騎士の条件' },
+        { id: 'a3_07', label: '第57話（S3-7話）', sub: '最も新しい英雄と最も古い英雄' },
+        { id: 'a3_08', label: '第58話（S3-8話）', sub: 'いつか好きになる人' },
+        { id: 'a3_09', label: '第59話（S3-9話）', sub: '混戦都市' },
+        { id: 'a3_10', label: '第60話（S3-10話）', sub: '強欲攻略戦' },
+        { id: 'a3_11', label: '第61話（S3-11話）', sub: 'リリアナ・マスカレード' },
+        { id: 'a3_12', label: '第62話（S3-12話）', sub: 'レグルス・コルニアス' },
+        { id: 'a3_13', label: '第63話（S3-13話）', sub: '戦士の称賛' },
+        { id: 'a3_14', label: '第64話（S3-14話）', sub: 'テレシア・ヴァン・アストレア' },
+        { id: 'a3_15', label: '第65話（S3-15話）', sub: '醜悪なる晩餐会' },
+        { id: 'a3_16', label: '第66話（S3-16話）', sub: 'プリステラ攻防戦リザルト' },
+      ]},
+      { id: 'a_s4', title: { ja: '第4期（放送中）', en: 'Season 4 (Airing)' }, icon: '✨', items: [
+        { id: 'a4_01', label: '第67話（S4-1話）', sub: '君を連れ出す理由／ゴージャス・タイガー・リローデッド' },
+        { id: 'a4_02', label: '第68話（S4-2話）', sub: '砂時間を越えろ' },
+        { id: 'a4_03', label: '第69話（S4-3話）', sub: '監視塔の番人' },
+        { id: 'a4_04', label: '第70話（S4-4話）', sub: '白い星空のアステリズム' },
+        { id: 'a4_05', label: '第71話（S4-5話）', sub: '棒振り' },
+        { id: 'a4_06', label: '第72話（S4-6話）', sub: 'ユリウス・ユークリウス' },
+        { id: 'a4_07', label: '第73話（S4-7話）', sub: 'コンビニを出ると、そこは不思議の世界でした' },
+        { id: 'a4_08', label: '第74話（S4-8話）', sub: 'オマエハダレダ' },
+        { id: 'a4_09', label: '第75話（S4-9話）', sub: '残骸' },
+      ]},
+      { id: 'a_ova', title: { ja: 'OVA・特別編', en: 'OVA / Specials' }, icon: '🎞️', items: [
+        { id: 'ova002', label: '氷結の絆', sub: '2019年 劇場OVA' },
+      ]},
+      { id: 'a_isekai', title: { ja: '異世界かるてっと', en: 'Isekai Quartet' }, icon: '🎭', items: [
+        { id: 'ik001', label: '異世界かるてっと Season1', sub: '全12話' },
+        { id: 'ik002', label: '異世界かるてっと Season2', sub: '全12話' },
+        { id: 'ik003', label: '異世界かるてっと Season3', sub: '全12話' },
+        { id: 'ik004', label: '異世界かるてっと 〜アナザーワールド〜', sub: '劇場版' },
+      ]},
+    ]
+  },
+  {
+    id: 'game',
+    sections: [
+      { id: 'g_nazo', title: { ja: '謎解きゲーム', en: 'Puzzle Games' }, icon: '🔍', items: [
+        { id: 'g_nazo1', label: '謎解きゲーム エミリアの徽章を取り戻せ！', sub: '' },
+        { id: 'g_nazo2', label: '謎解きゲーム 迷いの街の摩訶不思議', sub: '' },
+        { id: 'g_nazo3', label: '謎ファイル', sub: '' },
+      ]},
+      { id: 'g_console', title: { ja: 'コンシューマゲーム', en: 'Console Games' }, icon: '🕹️', items: [
+        { id: 'g_con1', label: '-DEATH OR KISS-', sub: '2017年 PS4/PSVita' },
+        { id: 'g_con2', label: '偽りの王選候補', sub: 'The Prophecy of the Throne 2021年 PS4/Switch/PC' },
+      ]},
+      { id: 'g_sp', title: { ja: 'スマートフォン', en: 'Mobile Games' }, icon: '📱', items: [
+        { id: 'g_sp1', label: 'リゼロパズルコレクション', sub: '' },
+        { id: 'g_sp2', label: '-infinity-', sub: '' },
+        { id: 'g_sp3', label: 'Lost in Memories', sub: '（サービス終了）' },
+        { id: 'g_sp4', label: "Witch's Re:surrection", sub: '' },
+      ]},
+      { id: 'g_other', title: { ja: 'その他', en: 'Others' }, icon: '🎲', items: [
+        { id: 'g_other1', label: '禁書と謎の精霊', sub: '' },
+        { id: 'g_other2', label: 'TRicK GEAR -Re:ゼロから始まる異世界生活-', sub: '' },
+      ]},
+    ]
+  },
+];
+
+let checked = new Set();
+
+function getAllIds() {
+  const ids = [];
+  for (const t of TABS) for (const s of t.sections) for (const i of s.items) ids.push(i.id);
+  return ids;
+}
+
+function encodeState() {
+  const allIds = getAllIds();
+  const bits = allIds.map(id => checked.has(id) ? '1' : '0').join('');
+  const bytes = [];
+  for (let i = 0; i < bits.length; i += 8)
+    bytes.push(parseInt(bits.slice(i, i + 8).padEnd(8, '0'), 2));
+  return btoa(String.fromCharCode(...bytes));
+}
+
+function decodeState(hash) {
+  try {
+    const bytes = atob(hash).split('').map(c => c.charCodeAt(0));
+    const bits = bytes.map(b => b.toString(2).padStart(8, '0')).join('');
+    getAllIds().forEach((id, i) => { if (bits[i] === '1') checked.add(id); });
+  } catch(e) {}
+}
+
+function saveState() {
+  history.replaceState(null, '', '#' + encodeState());
+}
+
+function buildUI() {
+  const tabBar = document.getElementById('tab-bar');
+  const panels = document.getElementById('panels');
+  tabBar.innerHTML = '';
+  panels.innerHTML = '';
+
+  const L = LANG[currentLang];
+  TABS.forEach((tab, ti) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (ti === 0 ? ' active' : '');
+    btn.textContent = L.tabs[tab.id] || tab.id;
+    btn.dataset.tab = tab.id;
+    btn.onclick = () => switchTab(tab.id);
+    tabBar.appendChild(btn);
+
+    const panel = document.createElement('div');
+    panel.className = 'tab-panel' + (ti === 0 ? ' active' : '');
+    panel.id = 'panel-' + tab.id;
+
+    tab.sections.forEach(sec => {
+      const card = document.createElement('div');
+      card.className = 'section-card';
+      card.id = 'sec-' + sec.id;
+
+      const hdr = document.createElement('div');
+      hdr.className = 'section-header';
+
+      const titleEl = document.createElement('div');
+      titleEl.className = 'section-title';
+      const secTitleText = typeof sec.title === 'object' ? sec.title[currentLang] : sec.title;
+      titleEl.innerHTML = sec.icon + ' ' + secTitleText;
+
+      const ctrl = document.createElement('div');
+      ctrl.className = 'section-controls';
+
+      const progText = document.createElement('span');
+      progText.className = 'section-progress-text';
+      progText.id = 'prog-' + sec.id;
+
+      const btnAll = document.createElement('button');
+      btnAll.className = 'btn-small';
+      btnAll.textContent = L.checkAll;
+      btnAll.onclick = (e) => { e.stopPropagation(); toggleAll(sec, true); };
+
+      const btnNone = document.createElement('button');
+      btnNone.className = 'btn-small';
+      btnNone.textContent = L.uncheckAll;
+      btnNone.onclick = (e) => { e.stopPropagation(); toggleAll(sec, false); };
+
+      ctrl.append(progText, btnAll, btnNone);
+      hdr.append(titleEl, ctrl);
+
+      const body = document.createElement('div');
+      body.className = 'section-body';
+
+      const barWrap = document.createElement('div');
+      barWrap.className = 'section-bar';
+      const barFill = document.createElement('div');
+      barFill.className = 'section-bar-fill';
+      barFill.id = 'bar-' + sec.id;
+      barFill.style.width = '0%';
+      barWrap.appendChild(barFill);
+
+      const ul = document.createElement('ul');
+      ul.className = 'check-list';
+
+      sec.items.forEach(item => {
+        const li = document.createElement('li');
+        li.className = 'check-item' + (checked.has(item.id) ? ' checked' : '');
+        li.dataset.id = item.id;
+        li.onclick = () => toggleItem(item.id);
+
+        const box = document.createElement('div');
+        box.className = 'check-box';
+        box.textContent = checked.has(item.id) ? '★' : '';
+
+        const wrap = document.createElement('div');
+        const lbl = document.createElement('span');
+        lbl.className = 'check-label';
+        lbl.textContent = item.label;
+        wrap.appendChild(lbl);
+        if (item.sub) {
+          const sub = document.createElement('span');
+          sub.className = 'check-sublabel';
+          sub.textContent = item.sub;
+          wrap.appendChild(sub);
+        }
+
+        li.append(box, wrap);
+        ul.appendChild(li);
+      });
+
+      body.append(barWrap, ul);
+      card.append(hdr, body);
+      panel.appendChild(card);
+    });
+
+    panels.appendChild(panel);
+  });
+
+  updateAllProgress();
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + id));
+}
+
+function toggleItem(id) {
+  if (checked.has(id)) checked.delete(id); else checked.add(id);
+  const li = document.querySelector('.check-item[data-id="' + id + '"]');
+  if (li) {
+    li.classList.toggle('checked', checked.has(id));
+    li.querySelector('.check-box').textContent = checked.has(id) ? '★' : '';
+  }
+  updateAllProgress();
+  saveState();
+}
+
+function toggleAll(sec, val) {
+  sec.items.forEach(item => {
+    if (val) checked.add(item.id); else checked.delete(item.id);
+    const li = document.querySelector('.check-item[data-id="' + item.id + '"]');
+    if (li) {
+      li.classList.toggle('checked', val);
+      li.querySelector('.check-box').textContent = val ? '★' : '';
+    }
+  });
+  updateAllProgress();
+  saveState();
+}
+
+function updateAllProgress() {
+  let gDone = 0, gTotal = 0;
+  for (const tab of TABS) {
+    for (const sec of tab.sections) {
+      const total = sec.items.length;
+      const done = sec.items.filter(i => checked.has(i.id)).length;
+      gDone += done; gTotal += total;
+      const pct = total ? Math.round(done / total * 100) : 0;
+      const pe = document.getElementById('prog-' + sec.id);
+      const be = document.getElementById('bar-' + sec.id);
+      if (pe) pe.textContent = done + ' / ' + total + ' (' + pct + '%)';
+      if (be) be.style.width = pct + '%';
+    }
+  }
+  document.getElementById('global-done').textContent = gDone;
+  document.getElementById('global-total').textContent = gTotal;
+  const gpct = gTotal ? Math.round(gDone / gTotal * 100) : 0;
+  document.getElementById('global-bar').style.width = gpct + '%';
+}
+
+// カテゴリ別達成率を計算
+function getCategoryStats() {
+  const L = LANG[currentLang];
+  const categoryMap = [
+    ['novel', L.categoryLabels.novel],
+    ['web', L.categoryLabels.web],
+    ['ex', L.categoryLabels.ex],
+    ['short', L.categoryLabels.short],
+    ['anime', L.categoryLabels.anime],
+    ['game', L.categoryLabels.game],
+  ];
+  const result = [];
+  for (const [tabId, label] of categoryMap) {
+    const tab = TABS.find(t => t.id === tabId);
+    if (!tab) continue;
+    let total = 0, done = 0;
+    for (const sec of tab.sections) {
+      for (const item of sec.items) {
+        total++;
+        if (checked.has(item.id)) done++;
+      }
+    }
+    result.push({ label: label, done, total, pct: total ? Math.round(done / total * 100) : 0 });
+  }
+  return result;
+}
+
+function generateShareCanvas() {
+  const canvas = document.getElementById('share-canvas');
+  const W = 1200, H = 630;
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // ── 背景：深夜の星空グラデーション ──
+  const bgGrad = ctx.createRadialGradient(W*0.4, H*0.3, 0, W*0.5, H*0.5, W*0.85);
+  bgGrad.addColorStop(0,   '#1a0d3d');
+  bgGrad.addColorStop(0.4, '#0d0628');
+  bgGrad.addColorStop(0.8, '#08041a');
+  bgGrad.addColorStop(1,   '#020109');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // ── 星（細かい無数の星） ──
+  const rng = (seed) => { let x = Math.sin(seed) * 43758; return x - Math.floor(x); };
+  for (let i = 0; i < 220; i++) {
+    const x = rng(i * 3.1) * W;
+    const y = rng(i * 7.9) * H;
+    const r = rng(i * 1.7) * 1.8 + 0.3;
+    const alpha = rng(i * 5.3) * 0.7 + 0.3;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.fill();
+  }
+
+  // ── キラキラ大きめの星（十字スパークル） ──
+  function drawSparkle(cx, cy, size, color) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = color;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = color;
+    for (let ang = 0; ang < Math.PI * 2; ang += Math.PI / 2) {
+      ctx.save();
+      ctx.rotate(ang);
+      ctx.beginPath();
+      ctx.moveTo(0, -size);
+      ctx.quadraticCurveTo(size * 0.15, -size * 0.15, 0, 0);
+      ctx.quadraticCurveTo(-size * 0.15, -size * 0.15, 0, -size);
+      ctx.fill();
+      ctx.restore();
+    }
+    // 中心点
+    ctx.beginPath();
+    ctx.arc(0, 0, size * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  const sparkles = [
+    [90, 60, 22, '#ffe4f7'], [1110, 80, 18, '#c8b4ff'],
+    [55, 280, 14, '#ffd6f0'], [1140, 320, 16, '#b8d4ff'],
+    [160, 500, 19, '#ffcce8'], [1060, 510, 13, '#d4c8ff'],
+    [320, 40, 11, '#fff0fb'], [880, 30, 15, '#e8d4ff'],
+    [600, 580, 12, '#ffddf5'], [420, 590, 10, '#c4dcff'],
+    [740, 55, 17, '#ffe8fa'], [230, 200, 9, '#ddd0ff'],
+    [970, 180, 10, '#ffd0ec'],
+  ];
+  sparkles.forEach(([x,y,s,c]) => drawSparkle(x, y, s, c));
+
+  // ── 輝くオーブ（背景の光） ──
+  function drawGlow(cx, cy, r, color) {
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0, color);
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  drawGlow(200,  150, 180, 'rgba(140,60,210,0.18)');
+  drawGlow(1000, 480, 200, 'rgba(80,120,255,0.14)');
+  drawGlow(600,  315, 260, 'rgba(200,100,255,0.07)');
+  drawGlow(950,  100, 140, 'rgba(255,180,220,0.10)');
+
+  // ── 中央カード（半透明ガラス） ──
+  const cX = W/2, cY = H/2;
+  const cW = 880, cH = 480;
+  ctx.save();
+  ctx.shadowBlur = 60;
+  ctx.shadowColor = 'rgba(180,100,255,0.35)';
+  const cardGrad = ctx.createLinearGradient(cX - cW/2, cY - cH/2, cX + cW/2, cY + cH/2);
+  cardGrad.addColorStop(0, 'rgba(255,255,255,0.10)');
+  cardGrad.addColorStop(1, 'rgba(180,130,255,0.06)');
+  ctx.fillStyle = cardGrad;
+  ctx.beginPath();
+  ctx.roundRect(cX - cW/2, cY - cH/2, cW, cH, 32);
+  ctx.fill();
+  ctx.restore();
+
+  // カード枠線（グラデーション）
+  ctx.save();
+  const borderGrad = ctx.createLinearGradient(cX - cW/2, cY - cH/2, cX + cW/2, cY + cH/2);
+  borderGrad.addColorStop(0,   'rgba(255,200,240,0.6)');
+  borderGrad.addColorStop(0.5, 'rgba(200,160,255,0.5)');
+  borderGrad.addColorStop(1,   'rgba(160,200,255,0.4)');
+  ctx.strokeStyle = borderGrad;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.roundRect(cX - cW/2, cY - cH/2, cW, cH, 32);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── タイトル ──
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.shadowBlur = 20;
+  ctx.shadowColor = 'rgba(220,160,255,0.9)';
+  const titleGrad = ctx.createLinearGradient(cX - 250, 0, cX + 250, 0);
+  titleGrad.addColorStop(0,   '#ffd6f0');
+  titleGrad.addColorStop(0.5, '#e8c8ff');
+  titleGrad.addColorStop(1,   '#c8dcff');
+  ctx.fillStyle = titleGrad;
+  ctx.font = 'bold 38px "Hiragino Sans", "Meiryo", sans-serif';
+  ctx.fillText('✦  ' + LANG[currentLang].canvasTitle + '  ✦', cX, 188);
+  ctx.restore();
+
+  // ── 区切りライン（グロウライン） ──
+  ctx.save();
+  ctx.shadowBlur = 12;
+  ctx.shadowColor = 'rgba(220,180,255,0.8)';
+  const lineGrad = ctx.createLinearGradient(cX-380, 0, cX+380, 0);
+  lineGrad.addColorStop(0,   'transparent');
+  lineGrad.addColorStop(0.2, 'rgba(220,180,255,0.6)');
+  lineGrad.addColorStop(0.8, 'rgba(180,210,255,0.6)');
+  lineGrad.addColorStop(1,   'transparent');
+  ctx.strokeStyle = lineGrad;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(cX - 380, 210);
+  ctx.lineTo(cX + 380, 210);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── コンプリート率（メイン） ──
+  const done  = parseInt(document.getElementById('global-done').textContent)  || 0;
+  const total = parseInt(document.getElementById('global-total').textContent) || 0;
+  const pct   = total ? Math.round(done / total * 100) : 0;
+
+  // 「あなたのリゼロコンプリート率は」
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(240,220,255,0.85)';
+  ctx.font = '22px "Hiragino Sans", "Meiryo", sans-serif';
+  ctx.fillText(LANG[currentLang].canvasSubtitle, cX, 255);
+  ctx.restore();
+
+  // 大きなパーセント数字
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.shadowBlur = 40;
+  ctx.shadowColor = '#ff8fd4';
+  const pctGrad = ctx.createLinearGradient(cX - 100, 280, cX + 100, 340);
+  pctGrad.addColorStop(0,   '#ffe0f5');
+  pctGrad.addColorStop(0.4, '#ffaadf');
+  pctGrad.addColorStop(0.7, '#e080ff');
+  pctGrad.addColorStop(1,   '#a8c8ff');
+  ctx.fillStyle = pctGrad;
+  ctx.font = 'bold 100px "Hiragino Sans", "Meiryo", sans-serif';
+  ctx.fillText(pct + '%', cX, 345);
+  ctx.restore();
+
+  // 「です ✦」
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = 'rgba(220,160,255,0.8)';
+  ctx.fillStyle = 'rgba(240,220,255,0.85)';
+  ctx.font = '22px "Hiragino Sans", "Meiryo", sans-serif';
+  ctx.fillText('★  ' + done + ' / ' + total + ' ' + LANG[currentLang].canvasItems + '  ★', cX, 380);
+  ctx.restore();
+
+  // ── カテゴリ別プログレス（コンパクト版） ──
+  const cats = getCategoryStats();
+  const colW = cW / Math.ceil(cats.length / 2);
+  const barColors = [
+    ['#e080ff','#ff8fd4'],['#80c8ff','#8fffda'],
+    ['#ffb3e0','#ffddaa'],['#b3e0ff','#c8b4ff'],
+    ['#ff9fd4','#ffd4aa'],['#90d4ff','#b4ffee'],
+    ['#f0a0ff','#ffa0c0'],
+  ];
+  const rows = [0,1,2,3];
+  const rowsB = [4,5,6,7].slice(0, Math.max(0, cats.length - 4));
+  const allRows = [rows, rowsB].filter(r => r.length > 0);
+
+  ctx.save();
+  cats.forEach((cat, i) => {
+    const col = Math.floor(i / Math.ceil(cats.length / 2));
+    const row = i % Math.ceil(cats.length / 2);
+    const rowCount = Math.ceil(cats.length / 2);
+    const xBase = (cX - cW/2 + 30) + col * (cW / 2 - 20) + (col > 0 ? 20 : 0);
+    const yBase = 410 + row * ((H - 440 - 60) / rowCount);
+
+    const bW = cW / 2 - 60;
+    const bH = 16;
+    const [c1, c2] = barColors[i % barColors.length];
+
+    // ラベル
+    ctx.fillStyle = 'rgba(240,225,255,0.9)';
+    ctx.font = '14px "Hiragino Sans","Meiryo",sans-serif';
+    ctx.textAlign = 'left';
+    ctx.shadowBlur = 0;
+    ctx.fillText(cat.label, xBase, yBase - 2);
+
+    // パーセント
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,210,240,0.95)';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText(cat.pct + '%', xBase + bW, yBase - 2);
+
+    // バー背景
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.beginPath();
+    ctx.roundRect(xBase, yBase + 4, bW, bH, bH/2);
+    ctx.fill();
+
+    // バー塗り
+    if (cat.pct > 0) {
+      const fw = Math.max(bW * cat.pct / 100, bH);
+      const bg = ctx.createLinearGradient(xBase, 0, xBase + fw, 0);
+      bg.addColorStop(0, c1 + 'cc');
+      bg.addColorStop(1, c2 + 'cc');
+      ctx.fillStyle = bg;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = c1;
+      ctx.beginPath();
+      ctx.roundRect(xBase, yBase + 4, fw, bH, bH/2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  });
+  ctx.restore();
+
+  // ── 下部：URLとハッシュタグ ──
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.fillStyle = 'rgba(200,180,255,0.55)';
+  ctx.font = '14px sans-serif';
+  const shortUrl = location.href.length > 60
+    ? location.href.slice(0, 57) + '...'
+    : location.href;
+  ctx.fillText('🔗 ' + shortUrl + '  #リゼロ #ReZero', cX, H - 22);
+  ctx.restore();
+
+  return canvas;
+}
+
+function shareToX() {
+  const canvas = generateShareCanvas();
+  const preview = document.getElementById('share-canvas-preview');
+  preview.src = canvas.toDataURL('image/png');
+
+  const done = document.getElementById('global-done').textContent;
+  const total = document.getElementById('global-total').textContent;
+  const pct = total > 0 ? Math.round(parseInt(done) / parseInt(total) * 100) : 0;
+  const tweetBody = currentLang === 'ja'
+    ? 'リゼロ既読チェックリスト達成率 ' + pct + '%（' + done + '/' + total + '）\n▶ ' + location.href + '\n#リゼロ #rezero'
+    : 'Re:Zero Checklist ' + pct + '% (' + done + '/' + total + ')\n▶ ' + location.href + '\n#ReZero #rezero';
+  const tweetText = encodeURIComponent(tweetBody);
+  const xBtn = document.getElementById('share-modal-xbtn');
+  xBtn.onclick = () => window.open('https://x.com/intent/tweet?text=' + tweetText, '_blank');
+
+  document.getElementById('share-modal-overlay').classList.add('open');
+}
+
+function closeShareModal() {
+  document.getElementById('share-modal-overlay').classList.remove('open');
+}
+
+function downloadShareImage() {
+  const canvas = document.getElementById('share-canvas');
+  const a = document.createElement('a');
+  a.download = 'rezero_checklist.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+// モーダル外クリックで閉じる
+document.getElementById('share-modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeShareModal();
+});
+
+function resetAll() {
+  const msg = currentLang === 'en'
+    ? 'Reset all checks? This cannot be undone.'
+    : '全てのチェックをリセットしますか？\nこの操作は元に戻せません。';
+  if (!confirm(msg)) return;
+  checked.clear();
+  saveToUrl();
+  updateAll();
+  showToast(currentLang === 'en' ? 'Reset complete ✨' : 'リセットしました ✨');
+}
+
+function copyURL() {
+  const href = location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(href).then(() => showToast(LANG[currentLang].copiedMsg + ' ✨'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = href;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(LANG[currentLang].copiedMsg + ' ✨');
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// INIT
+if (location.hash && location.hash.length > 1) {
+  decodeState(location.hash.slice(1));
+}
+applyLang();
+buildUI();
+</script>
+</body>
+</html>
