@@ -2,6 +2,6 @@
   "name": "rezero-og",
   "version": "1.0.0",
   "dependencies": {
-    "canvas": "^2.11.2"
+    "@resvg/resvg-js": "^2.6.2"
   }
 }
