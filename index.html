@@ -1353,12 +1353,12 @@ async function shareToX() {
   if (hintEl) {
     if (isMobileHint) {
       hintEl.innerHTML = L
-        ? '① Tap <b>𝕏 Post</b> → Share sheet opens → Tap <b>X</b> → Hit <b>Post</b> ✨'
-        : '① 「𝕏で投稿」→ 共有シートが開く → <b>X</b> をタップ → 「ポスト」で完了 ✨';
+        ? '① Tap <b>𝕏 Post</b> → Share sheet → Tap <b>X</b> → <b>Post</b> ✨<br><small>The image card appears when others see your tweet.</small>'
+        : '① 「𝕏で投稿」→ 共有シートが開く → <b>X</b> をタップ → 「ポスト」で完了 ✨<br><small>ツイートを見た人に画像カードが表示されます。</small>';
     } else {
       hintEl.innerHTML = L
-        ? '① Click <b>𝕏 Post</b> → X opens with text → Press <b>Ctrl+V</b> to paste image → <b>Post</b> ✨'
-        : '① 「𝕏で投稿」→ Xが開く → <b>Ctrl+V</b> で画像を貼り付け → 「ポスト」で完了 ✨';
+        ? '① Click <b>𝕏 Post</b> → X opens → just hit <b>Post</b> ✨<br><small>The image card appears automatically when others see your tweet.</small>'
+        : '① 「𝕏で投稿」→ Xが開く → そのまま「<b>ポスト</b>」するだけ ✨<br><small>ツイートを見た人に画像カードが自動で表示されます。</small>';
     }
   }
 
@@ -1373,62 +1373,18 @@ async function shareToX() {
   // Xで投稿ボタン
   const xBtn = document.getElementById('share-modal-xbtn');
   if (xBtn) xBtn.onclick = async () => {
-    canvas.toBlob(async (blob) => {
-      const file = new File([blob], 'rezero_checklist.png', {type:'image/png'});
-
-      // スマホ（iOS/Android）のみ Web Share API → Xアプリに画像＋テキスト渡す
-      // ※ PCのChrome/Edge(Windows11等)もcanShareがtrueになるため、UAでスマホ判定する
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      if (isMobile && navigator.canShare && navigator.canShare({files:[file]})) {
-        try {
-          await navigator.share({
-            files: [file],
-            text: tweetWithOg,
-            title: L ? 'Re:Zero Checklist' : 'リゼロ既読チェックリスト'
-          });
-          return;
-        } catch(e) {
-          if (e.name === 'AbortError') return; // ユーザーがキャンセル
+    // OGP方式：Xの投稿画面をテキスト入りで開くだけ（画像はXがNetlifyから自動取得）
+    window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(tweetWithOg), '_blank');
+    // スマホはWeb Share APIで共有シート経由
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile && navigator.canShare) {
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'rezero_checklist.png', {type:'image/png'});
+        if (navigator.canShare({files:[file]})) {
+          try { await navigator.share({files:[file], text:tweetWithOg}); } catch(e) {}
         }
-      }
-
-      // PC Chrome/Edge: クリップボードに画像コピー → X intent でテキスト入り画面を開く
-      let clipOk = false;
-      try {
-        if (navigator.clipboard && window.ClipboardItem) {
-          await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
-          clipOk = true;
-        }
-      } catch(e) {}
-
-      // X の投稿画面をテキスト入り状態で開く
-      window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(tweetWithOg), '_blank');
-
-      if (clipOk) {
-        // クリップボードにコピーできた場合
-        const hint = document.getElementById('share-hint-text');
-        if (hint) {
-          hint.innerHTML = L
-            ? '✅ Image copied to clipboard!<br>Paste it in X with <b>Ctrl+V</b> (or <b>Cmd+V</b>) ✨'
-            : '✅ 画像をクリップボードにコピーしました！<br>X の投稿欄に <b>Ctrl+V</b>（Mac は <b>Cmd+V</b>）で貼り付けてください ✨';
-          hint.style.color = '#1a8f3c';
-        }
-        showToast(L ? '📋 Image copied! Paste in X with Ctrl+V ✨' : '📋 画像コピー済み！Ctrl+Vで貼り付けてください ✨');
-      } else {
-        // フォールバック：ダウンロード
-        const a = document.createElement('a');
-        a.href = canvas.toDataURL('image/png');
-        a.download = 'rezero_checklist.png';
-        a.click();
-        const hint = document.getElementById('share-hint-text');
-        if (hint) {
-          hint.innerHTML = L
-            ? '📥 Image downloaded! Attach it to your X post ✨'
-            : '📥 画像をダウンロードしました！X の投稿欄に添付してください ✨';
-        }
-        showToast(L ? '📥 Image downloaded! Attach it to X ✨' : '📥 画像をダウンロードしました！');
-      }
-    });
+      });
+    }
   };
 
   document.getElementById('share-modal-overlay').classList.add('open');
