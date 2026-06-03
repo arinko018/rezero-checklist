@@ -435,7 +435,7 @@
     </div>
     <h1 id="site-title">✨ Re:ゼロから始める異世界生活 既読・視聴チェックリスト✨</h1>
     <p class="subtitle">💜Total Checklist💜</p>
-    <p class="update-date"><span id="update-label">最終更新日：</span><span id="update-date-val">2026/06/03</span></p>
+    <p class="update-date"><span id="update-label">最終更新日：</span><span id="update-date-val">2026/06/04</span></p>
   </header>
 
   <div class="global-progress">
@@ -487,10 +487,10 @@
 
 <script>
 // ↓ 更新したときにここの日付を変更してください
-const SITE_UPDATE_DATE = '2026/06/03';
+const SITE_UPDATE_DATE = '2026/06/04';
 
 // ↓ VercelデプロイURL（デプロイ後に変更してください）
-const VERCEL_OG_BASE = 'https://statuesque-seahorse-8fd9f8.netlify.app';
+const VERCEL_OG_BASE = 'https://rezero-checklist.netlify.app';
 
 
 // ─── 多言語辞書 ───
@@ -513,7 +513,7 @@ const LANG = {
       novel: '📚 書籍版',
       web:   '🌐 なろう版',
       ex:    '⚔️ EX',
-      short: '📖 短編・特典・その他',
+      short: '📖 短編・その他',
       anime: '🎬 アニメ',
       game:  '🎮 ゲーム',
     },
@@ -524,7 +524,7 @@ const LANG = {
       novel: '書籍版',
       web: 'なろう版',
       ex: 'EX',
-      short: '短編・特典',
+      short: '短編・その他',
       anime: 'アニメ',
       game: 'ゲーム',
     },
@@ -1340,6 +1340,17 @@ async function shareToX() {
   const tweetText = L
     ? 'My Re:Zero completion rate is ' + pct + '%\n' + location.href
     : '私のリゼロ既読・視聴率は ' + pct + '% です\n' + location.href;
+
+  // Netlify OGP共有URL（画像カード付きツイート用）
+  const shareUrl = VERCEL_OG_BASE + '/api/share'
+    + '?pct=' + encodeURIComponent(pct)
+    + '&done=' + encodeURIComponent(done)
+    + '&total=' + encodeURIComponent(total)
+    + '&lang=' + currentLang
+    + '&link=' + encodeURIComponent(location.href);
+  const tweetWithOg = L
+    ? 'My Re:Zero completion rate is ' + pct + '%\n' + shareUrl
+    : '私のリゼロ既読・視聴率は ' + pct + '% です\n' + shareUrl;
 
   // ツイートプレビュー表示
   const previewEl = document.getElementById('tweet-preview-text');
