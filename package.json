@@ -1,0 +1,9 @@
+{
+  "name": "rezero-og",
+  "version": "1.0.0",
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "satori": "^0.10.9",
+    "roboto-fontface": "*"
+  }
+}
