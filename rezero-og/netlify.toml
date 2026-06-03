@@ -1,0 +1,14 @@
+[build]
+  edge_functions = "netlify/edge-functions"
+  functions = "netlify/functions"
+
+# /api/og → Edge Function (画像生成)
+[[edge_functions]]
+  path = "/api/og"
+  function = "og"
+
+# /api/share → Netlify Function (OGP HTML)
+[[redirects]]
+  from = "/api/share"
+  to = "/.netlify/functions/share"
+  status = 200

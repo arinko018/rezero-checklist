@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/og.jsx": {
+      "runtime": "@vercel/node"
+    }
+  }
+}

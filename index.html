@@ -489,6 +489,9 @@
 // ↓ 更新したときにここの日付を変更してください
 const SITE_UPDATE_DATE = '2026/06/03';
 
+// ↓ VercelデプロイURL（デプロイ後に変更してください）
+const VERCEL_OG_BASE = 'https://rezero-og.vercel.app';
+
 
 // ─── 多言語辞書 ───
 const LANG = {
@@ -1363,7 +1366,7 @@ async function shareToX() {
         try {
           await navigator.share({
             files: [file],
-            text: tweetText,
+            text: tweetWithOg,
             title: L ? 'Re:Zero Checklist' : 'リゼロ既読チェックリスト'
           });
           return;
@@ -1382,7 +1385,7 @@ async function shareToX() {
       } catch(e) {}
 
       // X の投稿画面をテキスト入り状態で開く
-      window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(tweetText), '_blank');
+      window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(tweetWithOg), '_blank');
 
       if (clipOk) {
         // クリップボードにコピーできた場合
