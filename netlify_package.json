@@ -1,9 +1,0 @@
-{
-  "name": "rezero-og",
-  "version": "1.0.0",
-  "dependencies": {
-    "satori": "^0.10.9",
-    "sharp": "^0.33.2",
-    "roboto-fontface": "*"
-  }
-}
