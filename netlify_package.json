@@ -2,6 +2,7 @@
   "name": "rezero-og",
   "version": "1.0.0",
   "dependencies": {
-    "@resvg/resvg-js": "^2.6.2"
+    "@resvg/resvg-js": "^2.6.2",
+    "roboto-fontface": "*"
   }
 }

@@ -1,17 +1,49 @@
 const { Resvg } = require('@resvg/resvg-js');
-const fs = require('fs');
+const path = require('path');
+const fs   = require('fs');
 
-const FONT_PATH = '/tmp/DejaVuSans-Bold.ttf';
-// jsDelivr CDN (redirectなしで直接ダウンロード可能)
-const FONT_URL  = 'https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts/ttf/DejaVuSans-Bold.ttf';
+// npmパッケージ roboto-fontface に含まれるフォントファイルを使う
+// Netlifyのworking directoryはリポジトリルート(/var/task)
+function findFont() {
+  const candidates = [
+    // Netlify Lambda上のパス
+    path.join(process.cwd(), 'node_modules', 'roboto-fontface', 'fonts', 'roboto', 'Roboto-Bold.ttf'),
+    path.join(process.cwd(), 'node_modules', 'roboto-fontface', 'fonts', 'roboto', 'Roboto-Medium.ttf'),
+    path.join(process.cwd(), 'node_modules', 'roboto-fontface', 'fonts', 'roboto', 'Roboto-Regular.ttf'),
+    // フォールバック: __dirnameからの相対パス
+    path.join(__dirname, '..', '..', 'node_modules', 'roboto-fontface', 'fonts', 'roboto', 'Roboto-Bold.ttf'),
+    // /tmpにキャッシュされたフォント
+    '/tmp/font.ttf',
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p) && fs.statSync(p).size > 10000) return p;
+  }
+  return null;
+}
 
-async function ensureFont() {
-  if (fs.existsSync(FONT_PATH) && fs.statSync(FONT_PATH).size > 10000) return;
-  // Node.js 18+ の native fetch を使用
-  const res = await fetch(FONT_URL);
-  if (!res.ok) throw new Error(`Font download failed: ${res.status} ${res.statusText}`);
-  const buf = Buffer.from(await res.arrayBuffer());
-  fs.writeFileSync(FONT_PATH, buf);
+async function downloadFontIfNeeded() {
+  let found = findFont();
+  if (found) return found;
+
+  // CDNからダウンロード
+  const urls = [
+    'https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts/ttf/DejaVuSans-Bold.ttf',
+    'https://fonts.gstatic.com/s/roboto/v32/KFOlCnqEu92Fr1MmWUlfBBc-.woff2',
+  ];
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) {
+        const buf = Buffer.from(await res.arrayBuffer());
+        fs.writeFileSync('/tmp/font.ttf', buf);
+        console.log('Font downloaded from:', url, 'size:', buf.length);
+        return '/tmp/font.ttf';
+      }
+    } catch(e) {
+      console.error('Font download failed:', url, e.message);
+    }
+  }
+  return null;
 }
 
 exports.handler = async (event) => {
@@ -20,14 +52,10 @@ exports.handler = async (event) => {
   const done  = q.done  || '0';
   const total = q.total || '0';
 
-  try {
-    await ensureFont();
-  } catch (fontErr) {
-    // フォントDL失敗しても続行（文字なしでも画像は出る）
-    console.error('Font error:', fontErr.message);
-  }
+  const fontPath = await downloadFontIfNeeded();
+  console.log('Using font:', fontPath);
 
-  // 余白を詰めたコンパクトなデザイン
+  // コンパクトデザイン（余白小さく）
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -41,72 +69,47 @@ exports.handler = async (event) => {
       <stop offset="100%" stop-color="#7030b0"/>
     </linearGradient>
   </defs>
-
-  <!-- 背景 -->
   <rect width="1200" height="630" fill="url(#bg)"/>
-
-  <!-- ボケ装飾 -->
   <circle cx="80" cy="60" r="160" fill="rgba(255,182,193,0.45)" opacity="0.7"/>
   <circle cx="1120" cy="570" r="150" fill="rgba(206,147,216,0.45)" opacity="0.7"/>
   <circle cx="1050" cy="80" r="120" fill="rgba(255,204,224,0.5)" opacity="0.6"/>
-
-  <!-- カード（余白なし・フル幅に近い） -->
   <rect x="40" y="30" width="1120" height="570" rx="28"
         fill="rgba(255,255,255,0.85)" stroke="rgba(200,160,240,0.6)" stroke-width="2"/>
-
-  <!-- タイトル行 -->
   <text x="600" y="105" text-anchor="middle"
-        font-family="DejaVu Sans" font-size="42" font-weight="bold" fill="#9c27b0">Re:ZERO - Starting Life in Another World</text>
+        font-family="Roboto,DejaVu Sans,sans-serif" font-size="42" font-weight="bold" fill="#9c27b0">Re:ZERO - Starting Life in Another World</text>
   <text x="600" y="148" text-anchor="middle"
-        font-family="DejaVu Sans" font-size="26" fill="#b039c8">Read / Watch Checklist</text>
-
-  <!-- 区切り線 -->
+        font-family="Roboto,DejaVu Sans,sans-serif" font-size="26" fill="#b039c8">Read / Watch Checklist</text>
   <line x1="80" y1="168" x2="1120" y2="168" stroke="rgba(218,165,32,0.7)" stroke-width="2"/>
-
-  <!-- ラベル -->
   <text x="600" y="215" text-anchor="middle"
-        font-family="DejaVu Sans" font-size="28" fill="#9c3fb0">Completion Rate</text>
-
-  <!-- 大きな % -->
-  <text x="600" y="380" text-anchor="middle"
-        font-family="DejaVu Sans" font-size="180" font-weight="bold"
+        font-family="Roboto,DejaVu Sans,sans-serif" font-size="28" fill="#9c3fb0">Completion Rate</text>
+  <text x="600" y="390" text-anchor="middle"
+        font-family="Roboto,DejaVu Sans,sans-serif" font-size="180" font-weight="bold"
         fill="url(#pg)">${pct}%</text>
-
-  <!-- 達成数 -->
-  <text x="600" y="445" text-anchor="middle"
-        font-family="DejaVu Sans" font-size="30" fill="#8040b8">* ${done} / ${total} items *</text>
-
-  <!-- 区切り線 -->
-  <line x1="80" y1="468" x2="1120" y2="468" stroke="rgba(218,165,32,0.5)" stroke-width="1.5"/>
-
-  <!-- 下部サイト名 -->
-  <text x="600" y="510" text-anchor="middle"
-        font-family="DejaVu Sans" font-size="22" fill="rgba(120,60,180,0.7)">rezero-checklist.netlify.app</text>
-
-  <!-- キラキラ -->
-  <text x="90" y="65" font-size="28" fill="rgba(255,255,255,0.9)" text-anchor="middle">*</text>
-  <text x="1110" y="80" font-size="22" fill="rgba(255,255,255,0.9)" text-anchor="middle">*</text>
-  <text x="60" y="420" font-size="18" fill="rgba(255,255,255,0.8)" text-anchor="middle">*</text>
-  <text x="1140" y="440" font-size="20" fill="rgba(255,255,255,0.85)" text-anchor="middle">*</text>
+  <text x="600" y="450" text-anchor="middle"
+        font-family="Roboto,DejaVu Sans,sans-serif" font-size="32" fill="#8040b8">* ${done} / ${total} items *</text>
+  <line x1="80" y1="472" x2="1120" y2="472" stroke="rgba(218,165,32,0.5)" stroke-width="1.5"/>
+  <text x="600" y="518" text-anchor="middle"
+        font-family="Roboto,DejaVu Sans,sans-serif" font-size="22" fill="rgba(120,60,180,0.7)">rezero-checklist.netlify.app</text>
 </svg>`;
 
   try {
-    const fontOptions = fs.existsSync(FONT_PATH)
-      ? { fontFiles: [FONT_PATH], loadSystemFonts: false, defaultFontFamily: 'DejaVu Sans' }
+    const fontOpts = fontPath
+      ? { fontFiles: [fontPath], loadSystemFonts: false, defaultFontFamily: 'Roboto' }
       : { loadSystemFonts: true };
 
     const resvg = new Resvg(svg, {
       fitTo: { mode: 'width', value: 1200 },
-      font: fontOptions,
+      font: fontOpts,
     });
-    const pngData = resvg.render().asPng();
+    const png = resvg.render().asPng();
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=600' },
-      body: Buffer.from(pngData).toString('base64'),
+      body: Buffer.from(png).toString('base64'),
       isBase64Encoded: true,
     };
   } catch (err) {
-    return { statusCode: 500, body: 'Error: ' + err.message };
+    console.error('Render error:', err);
+    return { statusCode: 500, body: 'Render error: ' + err.message };
   }
 };
