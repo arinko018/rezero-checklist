@@ -77,7 +77,14 @@ exports.handler = async (event) => {
 </svg>`;
 
   try {
-    const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } });
+    const resvg = new Resvg(svg, {
+      fitTo: { mode: 'width', value: 1200 },
+      font: {
+        loadSystemFonts: true,
+        fontDirs: ['/usr/share/fonts', '/usr/local/share/fonts', '/var/task'],
+        defaultFontFamily: 'Arial',
+      },
+    });
     const pngData = resvg.render().asPng();
     return {
       statusCode: 200,
