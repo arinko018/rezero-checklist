@@ -468,18 +468,7 @@
     <canvas id="share-canvas" style="display:none"></canvas>
     <img id="share-canvas-preview" src="" alt="シェア画像プレビュー" />
     <div class="tweet-preview" id="tweet-preview-text"></div>
-    <div class="share-hint" id="share-hint-text"><span class="hint-title">📱 スマホ（iPhone / Android）の場合</span>
-<span class="hint-step">① 「𝕏で投稿」を押す → iOSの共有シートが開く</span>
-<span class="hint-step">② 共有シートの中から <b>X</b> のアイコンをタップ</span>
-<span class="hint-step">③ Xアプリが開き、画像＋テキスト設定済み → 「ポスト」で完了！</span>
-<span class="hint-title" style="margin-top:8px;display:block">💻 PC（Chrome / Edge）の場合</span>
-<span class="hint-step">① 「𝕏で投稿」を押す → Xの投稿画面がテキスト入りで開く</span>
-<span class="hint-step">② 画像はクリップボードにコピー済み → 投稿欄で <b>Ctrl+V</b>（Mac: <b>Cmd+V</b>）を押す</span>
-<span class="hint-step">③ 画像が貼り付けられたら「ポスト」で完了！</span>
-<span class="hint-title" style="margin-top:8px;display:block">💻 PC（その他のブラウザ）の場合</span>
-<span class="hint-step">① 「𝕏で投稿」を押す → 画像がダウンロードされ、Xの投稿画面が開く</span>
-<span class="hint-step">② Xの投稿欄にダウンロードした画像を添付する</span>
-<span class="hint-step">③ 「ポスト」で完了！</span></div>
+    <div class="share-hint" id="share-hint-text"></div>
     <div class="share-modal-btns">
       <button class="btn-dl" id="modal-btn-dl" onclick="downloadShareImage()">📥 ダウンロード</button>
       <button class="btn-xpost" id="share-modal-xbtn">𝕏で投稿</button>
@@ -1357,6 +1346,21 @@ async function shareToX() {
   // ツイートプレビュー表示
   const previewEl = document.getElementById('tweet-preview-text');
   if (previewEl) previewEl.textContent = tweetText;
+
+  // デバイス別の簡潔な説明
+  const isMobileHint = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const hintEl = document.getElementById('share-hint-text');
+  if (hintEl) {
+    if (isMobileHint) {
+      hintEl.innerHTML = L
+        ? '① Tap <b>𝕏 Post</b> → Share sheet opens → Tap <b>X</b> → Hit <b>Post</b> ✨'
+        : '① 「𝕏で投稿」→ 共有シートが開く → <b>X</b> をタップ → 「ポスト」で完了 ✨';
+    } else {
+      hintEl.innerHTML = L
+        ? '① Click <b>𝕏 Post</b> → X opens with text → Press <b>Ctrl+V</b> to paste image → <b>Post</b> ✨'
+        : '① 「𝕏で投稿」→ Xが開く → <b>Ctrl+V</b> で画像を貼り付け → 「ポスト」で完了 ✨';
+    }
+  }
 
   // ダウンロードボタン
   const dlBtn = document.getElementById('modal-btn-dl');
