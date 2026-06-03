@@ -2,6 +2,6 @@
   "name": "rezero-og",
   "version": "1.0.0",
   "dependencies": {
-    "pngjs": "^7.0.0"
+    "jimp": "0.22.12"
   }
 }
