@@ -81,8 +81,15 @@
     white-space: pre-wrap; word-break: break-all;
   }
   .share-hint {
-    font-size: 0.75rem; color: #888; margin: 6px 0 0;
-    text-align: center; line-height: 1.5;
+    font-size: 0.78rem; color: #555; margin: 8px 0 0;
+    text-align: left; line-height: 1.8;
+    background: rgba(0,0,0,0.03); border-radius: 10px; padding: 10px 14px;
+  }
+  .share-hint .hint-title {
+    font-weight: 700; color: #444; display: block; margin-bottom: 2px;
+  }
+  .share-hint .hint-step {
+    display: block; padding-left: 10px;
   }
   header .subtitle {
     color: rgba(255,255,255,0.88);
@@ -459,7 +466,18 @@
     <canvas id="share-canvas" style="display:none"></canvas>
     <img id="share-canvas-preview" src="" alt="シェア画像プレビュー" />
     <div class="tweet-preview" id="tweet-preview-text"></div>
-    <div class="share-hint" id="share-hint-text">📱 スマホの場合：Xアプリに画像＋テキストが自動セットされます<br>💻 PCの場合：「𝕏で投稿」でXが開き、画像はクリップボードにコピーされます（Ctrl+Vで貼付）</div>
+    <div class="share-hint" id="share-hint-text"><span class="hint-title">📱 スマホ（iPhone / Android）の場合</span>
+<span class="hint-step">① 「𝕏で投稿」を押す → iOSの共有シートが開く</span>
+<span class="hint-step">② 共有シートの中から <b>X</b> のアイコンをタップ</span>
+<span class="hint-step">③ Xアプリが開き、画像＋テキスト設定済み → 「ポスト」で完了！</span>
+<span class="hint-title" style="margin-top:8px;display:block">💻 PC（Chrome / Edge）の場合</span>
+<span class="hint-step">① 「𝕏で投稿」を押す → Xの投稿画面がテキスト入りで開く</span>
+<span class="hint-step">② 画像はクリップボードにコピー済み → 投稿欄で <b>Ctrl+V</b>（Mac: <b>Cmd+V</b>）を押す</span>
+<span class="hint-step">③ 画像が貼り付けられたら「ポスト」で完了！</span>
+<span class="hint-title" style="margin-top:8px;display:block">💻 PC（その他のブラウザ）の場合</span>
+<span class="hint-step">① 「𝕏で投稿」を押す → 画像がダウンロードされ、Xの投稿画面が開く</span>
+<span class="hint-step">② Xの投稿欄にダウンロードした画像を添付する</span>
+<span class="hint-step">③ 「ポスト」で完了！</span></div>
     <div class="share-modal-btns">
       <button class="btn-dl" id="modal-btn-dl" onclick="downloadShareImage()">📥 ダウンロード</button>
       <button class="btn-xpost" id="share-modal-xbtn">𝕏で投稿</button>
@@ -1338,8 +1356,10 @@ async function shareToX() {
     canvas.toBlob(async (blob) => {
       const file = new File([blob], 'rezero_checklist.png', {type:'image/png'});
 
-      // スマホ（iOS/Android）: Web Share API → Xアプリに画像＋テキスト渡す
-      if (navigator.canShare && navigator.canShare({files:[file]})) {
+      // スマホ（iOS/Android）のみ Web Share API → Xアプリに画像＋テキスト渡す
+      // ※ PCのChrome/Edge(Windows11等)もcanShareがtrueになるため、UAでスマホ判定する
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile && navigator.canShare && navigator.canShare({files:[file]})) {
         try {
           await navigator.share({
             files: [file],
