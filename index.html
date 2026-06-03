@@ -451,7 +451,7 @@
   <div class="action-row">
     <button class="btn btn-x" id="btn-share-x" onclick="shareToX()">𝕏でシェア</button>
     <button class="btn btn-copy" id="btn-copy-url" onclick="copyURL()">🔗 URLをコピー</button>
-    <button class="btn btn-reset" id="btn-reset" onclick="resetAll()">🗑️ リセット</button>
+    <button class="btn btn-reset" id="btn-reset" onclick="resetAll()" id="btn-reset">🔄 チェックをやりなおす</button>
   </div>
 
   <div class="tabs" id="tab-bar"></div>
@@ -585,7 +585,7 @@ function applyLang() {
   const btnCopy = document.getElementById('btn-copy-url');
   if (btnCopy) btnCopy.textContent = L.copyUrl;
   const btnReset = document.getElementById('btn-reset');
-  if (btnReset) btnReset.textContent = currentLang === 'en' ? '🗑️ Reset' : '🗑️ リセット';
+  if (btnReset) btnReset.textContent = currentLang === 'en' ? '🔄 Start Over' : '🔄 チェックをやりなおす';
   // modal
   const mtEl = document.getElementById('modal-title');
   if (mtEl) mtEl.textContent = '📤 ' + L.modalTitle;
@@ -1407,14 +1407,10 @@ document.getElementById('share-modal-overlay').addEventListener('click', functio
 });
 
 function resetAll() {
-  const msg = currentLang === 'en'
-    ? 'Reset all checks? This cannot be undone.'
-    : '全てのチェックをリセットしますか？\nこの操作は元に戻せません。';
-  if (!confirm(msg)) return;
   checked.clear();
   saveState();
   buildUI();
-  showToast(currentLang === 'en' ? 'Reset complete ✨' : 'リセットしました ✨');
+  showToast(currentLang === 'en' ? '🔄 Start Over ✨' : '🔄 チェックをリセットしました ✨');
 }
 
 function copyURL() {
