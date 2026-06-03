@@ -3,13 +3,10 @@ exports.handler = async (event) => {
   const pct   = q.pct   || '0';
   const done  = q.done  || '0';
   const total = q.total || '0';
-  const link  = q.link  || 'https://matsuuraandie.github.io/rezero/';
+  const link  = q.link  || 'https://rezero-checklist.netlify.app/';
   const lang  = q.lang  || 'ja';
 
-  const host = event.headers.host || 'localhost:8888';
-  const proto = event.headers['x-forwarded-proto'] || 'https';
-  const baseUrl = `${proto}://${host}`;
-
+  const baseUrl = process.env.URL || 'https://rezero-checklist.netlify.app';
   const ogImageUrl = `${baseUrl}/api/og?pct=${encodeURIComponent(pct)}&done=${encodeURIComponent(done)}&total=${encodeURIComponent(total)}&lang=${lang}`;
 
   const isEn = lang === 'en';
@@ -38,17 +35,14 @@ exports.handler = async (event) => {
   <meta name="twitter:image"       content="${ogImageUrl}">
   <meta http-equiv="refresh" content="0; url=${link}">
 </head>
-<body style="margin:0;background:#f3e5f5;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:sans-serif;">
-  <a href="${link}" style="color:#9c27b0;font-size:18px;">→ チェックリストへ移動中...</a>
+<body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f3e5f5;font-family:sans-serif;">
+  <a href="${link}" style="color:#9c27b0;font-size:18px;">チェックリストへ移動中...</a>
 </body>
 </html>`;
 
   return {
     statusCode: 200,
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 's-maxage=3600, stale-while-revalidate',
-    },
+    headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' },
     body: html,
   };
 };
