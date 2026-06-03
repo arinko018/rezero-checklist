@@ -74,18 +74,6 @@
     transition: background 0.2s;
   }
   #lang-toggle:hover { background: rgba(255,255,255,0.25); }
-  #x-username-row {
-    display: flex; align-items: center; gap: 8px;
-    justify-content: center; margin-top: 8px;
-    font-size: 0.75rem; color: rgba(255,255,255,0.8);
-  }
-  #x-username-input {
-    background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
-    color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem;
-    width: 140px; outline: none;
-  }
-  #x-username-input::placeholder { color: rgba(255,255,255,0.5); }
-  #x-username-input:focus { background: rgba(255,255,255,0.3); }
   .tweet-preview {
     background: rgba(29,161,242,0.08); border: 1px solid rgba(29,161,242,0.3);
     border-radius: 12px; padding: 10px 14px; margin: 10px 0;
@@ -439,11 +427,6 @@
       <button id="lang-toggle" onclick="toggleLang()">🇺🇸 EN</button>
     </div>
     <h1 id="site-title">✨ Re:ゼロから始める異世界生活 既読・視聴チェックリスト✨</h1>
-    <div id="x-username-row">
-      <span id="x-id-label">𝕏 ID：</span>
-      <input id="x-username-input" type="text" placeholder="@username（省略可）"
-             oninput="saveXUsername(this.value)" maxlength="30">
-    </div>
     <p class="subtitle">💜Total Checklist💜</p>
     <p class="update-date"><span id="update-label">最終更新日：</span><span id="update-date-val">2026/06/03</span></p>
   </header>
@@ -476,7 +459,7 @@
     <canvas id="share-canvas" style="display:none"></canvas>
     <img id="share-canvas-preview" src="" alt="シェア画像プレビュー" />
     <div class="tweet-preview" id="tweet-preview-text"></div>
-    <div class="share-hint" id="share-hint-text">📥 「𝕏で投稿」を押すと画像がダウンロードされます。<br>Xが開いたら画像を添付して投稿してください！</div>
+    <div class="share-hint" id="share-hint-text">📱 スマホの場合：Xアプリに画像＋テキストが自動セットされます<br>💻 PCの場合：「𝕏で投稿」でXが開き、画像はクリップボードにコピーされます（Ctrl+Vで貼付）</div>
     <div class="share-modal-btns">
       <button class="btn-dl" id="modal-btn-dl" onclick="downloadShareImage()">📥 ダウンロード</button>
       <button class="btn-xpost" id="share-modal-xbtn">𝕏で投稿</button>
@@ -488,14 +471,6 @@
 // ↓ 更新したときにここの日付を変更してください
 const SITE_UPDATE_DATE = '2026/06/03';
 
-function saveXUsername(val) {
-  localStorage.setItem('rezero_x_username', val.trim());
-}
-function loadXUsername() {
-  const v = localStorage.getItem('rezero_x_username') || '';
-  const el = document.getElementById('x-username-input');
-  if (el && v) el.value = v.startsWith('@') ? v : (v ? '@'+v : '');
-}
 
 // ─── 多言語辞書 ───
 const LANG = {
@@ -1341,11 +1316,9 @@ async function shareToX() {
   const pct   = total>0 ? Math.round(parseInt(done)/parseInt(total)*100) : 0;
   const L = currentLang==='en';
 
-  const xUser = (localStorage.getItem('rezero_x_username') || '').replace(/^@/, '').trim();
-  const nameStr = xUser ? '@' + xUser + ' の' : '私の';
   const tweetText = L
-    ? nameStr + 'Re:Zero completion rate is ' + pct + '%\n' + location.href
-    : nameStr + 'リゼロ既読・視聴率は ' + pct + '% です\n' + location.href;
+    ? 'My Re:Zero completion rate is ' + pct + '%\n' + location.href
+    : '私のリゼロ既読・視聴率は ' + pct + '% です\n' + location.href;
 
   // ツイートプレビュー表示
   const previewEl = document.getElementById('tweet-preview-text');
@@ -1365,36 +1338,55 @@ async function shareToX() {
     canvas.toBlob(async (blob) => {
       const file = new File([blob], 'rezero_checklist.png', {type:'image/png'});
 
-      // ① スマホ: Web Share API (ファイル添付)
+      // スマホ（iOS/Android）: Web Share API → Xアプリに画像＋テキスト渡す
       if (navigator.canShare && navigator.canShare({files:[file]})) {
         try {
-          await navigator.share({files:[file], text:tweetText, title:'リゼロ既読チェックリスト'});
+          await navigator.share({
+            files: [file],
+            text: tweetText,
+            title: L ? 'Re:Zero Checklist' : 'リゼロ既読チェックリスト'
+          });
           return;
-        } catch(e) { /* fallthrough */ }
+        } catch(e) {
+          if (e.name === 'AbortError') return; // ユーザーがキャンセル
+        }
       }
 
-      // ② PC Chrome: クリップボードに画像をコピー → X を開く
+      // PC Chrome/Edge: クリップボードに画像コピー → X intent でテキスト入り画面を開く
       let clipOk = false;
       try {
-        await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
-        clipOk = true;
+        if (navigator.clipboard && window.ClipboardItem) {
+          await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+          clipOk = true;
+        }
       } catch(e) {}
 
-      // X intent を開く（テキストのみ）
-      window.open('https://x.com/intent/tweet?text='+encodeURIComponent(tweetText), '_blank');
-
-      // ③ 同時に画像もダウンロード（念のため）
-      const a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png'); a.download='rezero_checklist.png'; a.click();
+      // X の投稿画面をテキスト入り状態で開く
+      window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(tweetText), '_blank');
 
       if (clipOk) {
-        showToast(L
-          ? '📋 Image copied to clipboard! Paste it into your tweet ✨'
-          : '📋 画像をクリップボードにコピーしました！ツイートに貼り付けてください ✨');
+        // クリップボードにコピーできた場合
+        const hint = document.getElementById('share-hint-text');
+        if (hint) {
+          hint.innerHTML = L
+            ? '✅ Image copied to clipboard!<br>Paste it in X with <b>Ctrl+V</b> (or <b>Cmd+V</b>) ✨'
+            : '✅ 画像をクリップボードにコピーしました！<br>X の投稿欄に <b>Ctrl+V</b>（Mac は <b>Cmd+V</b>）で貼り付けてください ✨';
+          hint.style.color = '#1a8f3c';
+        }
+        showToast(L ? '📋 Image copied! Paste in X with Ctrl+V ✨' : '📋 画像コピー済み！Ctrl+Vで貼り付けてください ✨');
       } else {
-        showToast(L
-          ? '📥 Image downloaded! Attach it to your tweet on X ✨'
-          : '📥 画像をダウンロードしました！Xのツイートに添付してください ✨');
+        // フォールバック：ダウンロード
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = 'rezero_checklist.png';
+        a.click();
+        const hint = document.getElementById('share-hint-text');
+        if (hint) {
+          hint.innerHTML = L
+            ? '📥 Image downloaded! Attach it to your X post ✨'
+            : '📥 画像をダウンロードしました！X の投稿欄に添付してください ✨';
+        }
+        showToast(L ? '📥 Image downloaded! Attach it to X ✨' : '📥 画像をダウンロードしました！');
       }
     });
   };
