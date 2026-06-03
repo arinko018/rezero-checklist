@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23a855f7'/><text y='72' x='50' text-anchor='middle' font-size='70' fill='white'>✦</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Re:ゼロから始める異世界生活 チェックリスト</title>
 <style>
@@ -414,9 +416,9 @@
     <div class="header-top">
       <button id="lang-toggle" onclick="toggleLang()">🇺🇸 EN</button>
     </div>
-    <h1 id="site-title">✨ Re:ゼロから始める異世界生活 ✨</h1>
-    <p class="subtitle">Total Checklist — Lost in Memories Style 💜</p>
-    <p class="update-date"><span id="update-label">最終更新日：</span><span id="update-date-val">2026年06月02日</span></p>
+    <h1 id="site-title">✨ Re:ゼロから始める異世界生活 既読・視聴チェックリスト✨</h1>
+    <p class="subtitle">💜Total Checklist💜</p>
+    <p class="update-date"><span id="update-label">最終更新日：</span><span id="update-date-val">2026/06/03</span></p>
   </header>
 
   <div class="global-progress">
@@ -428,7 +430,7 @@
   </div>
 
   <div class="action-row">
-    <button class="btn btn-x" id="btn-share-x" onclick="shareToX()">𝕏 Xでシェア</button>
+    <button class="btn btn-x" id="btn-share-x" onclick="shareToX()">𝕏でシェア</button>
     <button class="btn btn-copy" id="btn-copy-url" onclick="copyURL()">🔗 URLをコピー</button>
     <button class="btn btn-reset" id="btn-reset" onclick="resetAll()">🗑️ リセット</button>
   </div>
@@ -448,36 +450,36 @@
     <img id="share-canvas-preview" src="" alt="シェア画像プレビュー" />
     <div class="share-modal-btns">
       <button class="btn-dl" id="modal-btn-dl" onclick="downloadShareImage()">📥 ダウンロード</button>
-      <button class="btn-xpost" id="share-modal-xbtn">𝕏 Xで投稿する</button>
+      <button class="btn-xpost" id="share-modal-xbtn">𝕏で投稿</button>
     </div>
   </div>
 </div>
 
 <script>
 // ↓ 更新したときにここの日付を変更してください
-const SITE_UPDATE_DATE = '2026年06月02日';
+const SITE_UPDATE_DATE = '2026/06/03';
 
 // ─── 多言語辞書 ───
 const LANG = {
   ja: {
-    siteTitle: 'Re:ゼロ 既読・視聴チェックリスト',
+    siteTitle: 'Re:ゼロから始める異世界生活 既読・視聴チェックリスト',
     updateLabel: '最終更新日：',
     copyUrl: '🔗 URLをコピー',
-    shareX: '𝕏 Xでシェア',
+    shareX: '𝕏でシェア',
     copiedMsg: 'URLをコピーしました！',
     globalProgress: '総合達成率',
     checkAll: '全選択',
     uncheckAll: '全解除',
     modalTitle: 'シェア画像',
     downloadBtn: '📥 ダウンロード',
-    postX: '𝕏 Xで投稿',
+    postX: '𝕏で投稿',
     closeBtn: '✕ 閉じる',
     noContent: 'コンテンツなし',
     tabs: {
       novel: '📚 書籍版',
       web:   '🌐 なろう版',
       ex:    '⚔️ EX',
-      short: '📖 短編・特典',
+      short: '📖 短編・特典・その他',
       anime: '🎬 アニメ',
       game:  '🎮 ゲーム',
     },
@@ -494,24 +496,24 @@ const LANG = {
     },
   },
   en: {
-    siteTitle: 'Re:Zero Read/Watch Checklist',
+    siteTitle: 'Re:ZERO -Starting Life in Another World- Complete Checklist',
     updateLabel: 'Last Updated: ',
     copyUrl: '🔗 Copy URL',
-    shareX: '𝕏 Share on X',
+    shareX: '𝕏 Share',
     copiedMsg: 'URL copied!',
     globalProgress: 'Overall Progress',
     checkAll: 'Select All',
     uncheckAll: 'Deselect All',
     modalTitle: 'Share Image',
     downloadBtn: '📥 Download',
-    postX: '𝕏 Post on X',
+    postX: '𝕏 Post',
     closeBtn: '✕ Close',
     noContent: 'No content',
     tabs: {
       novel: '📚 Novels',
       web:   '🌐 Web Novel',
       ex:    '⚔️ EX Series',
-      short: '📖 Short Stories',
+      short: '📖 Short Stories & More',
       anime: '🎬 Anime',
       game:  '🎮 Games',
     },
@@ -566,75 +568,77 @@ function applyLang() {
   if (dlEl) dlEl.textContent = L.downloadBtn;
   const xpostEl = document.getElementById('share-modal-xbtn');
   if (xpostEl) xpostEl.textContent = L.postX;
+  const closeEl = document.getElementById('share-modal-close');
+  if (closeEl) closeEl.textContent = L.closeBtn;
 }
 
 const TABS = [
   {
     id: 'novel',
     sections: [
-      { id: 's_ch1', title: { ja: '第一章「怒涛の一日目」', en: '第一章「怒涛の一日目」' }, icon: '📗', items: [
-        { id: 'n001', label: '第1巻', sub: '第一章 怒涛の一日目' },
+      { id: 's_ch1', title: { ja: '第一章「怒涛の一日目」', en: 'Arc 1 "A Day That Feels Like Forever"' }, icon: '📗', items: [
+        { id: 'n001', label: { ja: '第1巻', en: 'Vol. 1' }, sub: '' },
       ]},
-      { id: 's_ch2', title: { ja: '第二章「激動の一週間」', en: '第二章「激動の一週間」' }, icon: '📗', items: [
-        { id: 'n002', label: '第2巻', sub: '第二章 激動の一週間（前編）' },
-        { id: 'n003', label: '第3巻', sub: '第二章 激動の一週間（後編）' },
+      { id: 's_ch2', title: { ja: '第二章「激動の一週間」', en: 'Arc 2 "A Week That Changes Everything"' }, icon: '📗', items: [
+        { id: 'n002', label: { ja: '第2巻', en: 'Vol. 2' }, sub: '' },
+        { id: 'n003', label: { ja: '第3巻', en: 'Vol. 3' }, sub: '' },
       ]},
-      { id: 's_ch3', title: { ja: '第三章「再来の王都」', en: '第三章「再来の王都」' }, icon: '📗', items: [
-        { id: 'n004', label: '第4巻', sub: '第三章 再来の王都（1）' },
-        { id: 'n005', label: '第5巻', sub: '第三章 再来の王都（2）' },
-        { id: 'n006', label: '第6巻', sub: '第三章 再来の王都（3）' },
-        { id: 'n007', label: '第7巻', sub: '第三章 再来の王都（4）' },
-        { id: 'n008', label: '第8巻', sub: '第三章 再来の王都（5）' },
-        { id: 'n009', label: '第9巻', sub: '第三章 再来の王都（6）' },
+      { id: 's_ch3', title: { ja: '第三章「再来の王都」', en: 'Arc 3 "The Royal Capital Revisited"' }, icon: '📗', items: [
+        { id: 'n004', label: { ja: '第4巻', en: 'Vol. 4' }, sub: '' },
+        { id: 'n005', label: { ja: '第5巻', en: 'Vol. 5' }, sub: '' },
+        { id: 'n006', label: { ja: '第6巻', en: 'Vol. 6' }, sub: '' },
+        { id: 'n007', label: { ja: '第7巻', en: 'Vol. 7' }, sub: '' },
+        { id: 'n008', label: { ja: '第8巻', en: 'Vol. 8' }, sub: '' },
+        { id: 'n009', label: { ja: '第9巻', en: 'Vol. 9' }, sub: '' },
       ]},
-      { id: 's_ch4', title: { ja: '第四章「永遠の契約」', en: '第四章「永遠の契約」' }, icon: '📗', items: [
-        { id: 'n010', label: '第10巻', sub: '第四章 永遠の契約（1）' },
-        { id: 'n011', label: '第11巻', sub: '第四章 永遠の契約（2）' },
-        { id: 'n012', label: '第12巻', sub: '第四章 永遠の契約（3）' },
-        { id: 'n013', label: '第13巻', sub: '第四章 永遠の契約（4）' },
-        { id: 'n014', label: '第14巻', sub: '第四章 永遠の契約（5）' },
-        { id: 'n015', label: '第15巻', sub: '第四章 永遠の契約（6）' },
+      { id: 's_ch4', title: { ja: '第四章「永遠の契約」', en: 'Arc 4 "The Eternal Contract"' }, icon: '📗', items: [
+        { id: 'n010', label: { ja: '第10巻', en: 'Vol. 10' }, sub: '' },
+        { id: 'n011', label: { ja: '第11巻', en: 'Vol. 11' }, sub: '' },
+        { id: 'n012', label: { ja: '第12巻', en: 'Vol. 12' }, sub: '' },
+        { id: 'n013', label: { ja: '第13巻', en: 'Vol. 13' }, sub: '' },
+        { id: 'n014', label: { ja: '第14巻', en: 'Vol. 14' }, sub: '' },
+        { id: 'n015', label: { ja: '第15巻', en: 'Vol. 15' }, sub: '' },
       ]},
-      { id: 's_ch5', title: { ja: '第五章「歴史を刻む星々」', en: '第五章「歴史を刻む星々」' }, icon: '📗', items: [
-        { id: 'n016', label: '第16巻', sub: '第五章 歴史を刻む星々（1）' },
-        { id: 'n017', label: '第17巻', sub: '第五章 歴史を刻む星々（2）' },
-        { id: 'n018', label: '第18巻', sub: '第五章 歴史を刻む星々（3）' },
-        { id: 'n019', label: '第19巻', sub: '第五章 歴史を刻む星々（4）' },
-        { id: 'n020', label: '第20巻', sub: '第五章 歴史を刻む星々（5）' },
+      { id: 's_ch5', title: { ja: '第五章「歴史を刻む星々」', en: 'Arc 5 "Stars That Engrave History"' }, icon: '📗', items: [
+        { id: 'n016', label: { ja: '第16巻', en: 'Vol. 16' }, sub: '' },
+        { id: 'n017', label: { ja: '第17巻', en: 'Vol. 17' }, sub: '' },
+        { id: 'n018', label: { ja: '第18巻', en: 'Vol. 18' }, sub: '' },
+        { id: 'n019', label: { ja: '第19巻', en: 'Vol. 19' }, sub: '' },
+        { id: 'n020', label: { ja: '第20巻', en: 'Vol. 20' }, sub: '' },
       ]},
-      { id: 's_ch6', title: { ja: '第六章「記憶の回廊」', en: '第六章「記憶の回廊」' }, icon: '📗', items: [
-        { id: 'n021', label: '第21巻', sub: '第六章 記憶の回廊（1）' },
-        { id: 'n022', label: '第22巻', sub: '第六章 記憶の回廊（2）' },
-        { id: 'n023', label: '第23巻', sub: '第六章 記憶の回廊（3）' },
-        { id: 'n024', label: '第24巻', sub: '第六章 記憶の回廊（4）' },
-        { id: 'n025', label: '第25巻', sub: '第六章 記憶の回廊（5）' },
+      { id: 's_ch6', title: { ja: '第六章「記憶の回廊」', en: 'Arc 6 "The Corridor of Memory"' }, icon: '📗', items: [
+        { id: 'n021', label: { ja: '第21巻', en: 'Vol. 21' }, sub: '' },
+        { id: 'n022', label: { ja: '第22巻', en: 'Vol. 22' }, sub: '' },
+        { id: 'n023', label: { ja: '第23巻', en: 'Vol. 23' }, sub: '' },
+        { id: 'n024', label: { ja: '第24巻', en: 'Vol. 24' }, sub: '' },
+        { id: 'n025', label: { ja: '第25巻', en: 'Vol. 25' }, sub: '' },
       ]},
-      { id: 's_ch7', title: { ja: '第七章「狼の国」', en: '第七章「狼の国」' }, icon: '📗', items: [
-        { id: 'n026', label: '第26巻', sub: '第七章 狼の国（1）' },
-        { id: 'n027', label: '第27巻', sub: '第七章 狼の国（2）' },
-        { id: 'n028', label: '第28巻', sub: '第七章 狼の国（3）' },
-        { id: 'n029', label: '第29巻', sub: '第七章 狼の国（4）' },
-        { id: 'n030', label: '第30巻', sub: '第七章 狼の国（5）' },
-        { id: 'n031', label: '第31巻', sub: '第七章 狼の国（6）' },
-        { id: 'n032', label: '第32巻', sub: '第七章 狼の国（7）' },
-        { id: 'n033', label: '第33巻', sub: '第七章 狼の国（8）' },
+      { id: 's_ch7', title: { ja: '第七章「狼の国」', en: 'Arc 7 "The Land of the Wolves"' }, icon: '📗', items: [
+        { id: 'n026', label: { ja: '第26巻', en: 'Vol. 26' }, sub: '' },
+        { id: 'n027', label: { ja: '第27巻', en: 'Vol. 27' }, sub: '' },
+        { id: 'n028', label: { ja: '第28巻', en: 'Vol. 28' }, sub: '' },
+        { id: 'n029', label: { ja: '第29巻', en: 'Vol. 29' }, sub: '' },
+        { id: 'n030', label: { ja: '第30巻', en: 'Vol. 30' }, sub: '' },
+        { id: 'n031', label: { ja: '第31巻', en: 'Vol. 31' }, sub: '' },
+        { id: 'n032', label: { ja: '第32巻', en: 'Vol. 32' }, sub: '' },
+        { id: 'n033', label: { ja: '第33巻', en: 'Vol. 33' }, sub: '' },
       ]},
-      { id: 's_ch8', title: { ja: '第八章「ヴィンセント・ヴォラキア」', en: '第八章「ヴィンセント・ヴォラキア」' }, icon: '📗', items: [
-        { id: 'n034', label: '第34巻', sub: '第八章 ヴィンセント・ヴォラキア（1）' },
-        { id: 'n035', label: '第35巻', sub: '第八章 ヴィンセント・ヴォラキア（2）' },
-        { id: 'n036', label: '第36巻', sub: '第八章 ヴィンセント・ヴォラキア（3）' },
-        { id: 'n037', label: '第37巻', sub: '第八章 ヴィンセント・ヴォラキア（4）' },
-        { id: 'n038', label: '第38巻', sub: '第八章 ヴィンセント・ヴォラキア（5）' },
+      { id: 's_ch8', title: { ja: '第八章「ヴィンセント・ヴォラキア」', en: 'Arc 8 "Vincent Vollachia"' }, icon: '📗', items: [
+        { id: 'n034', label: { ja: '第34巻', en: 'Vol. 34' }, sub: '' },
+        { id: 'n035', label: { ja: '第35巻', en: 'Vol. 35' }, sub: '' },
+        { id: 'n036', label: { ja: '第36巻', en: 'Vol. 36' }, sub: '' },
+        { id: 'n037', label: { ja: '第37巻', en: 'Vol. 37' }, sub: '' },
+        { id: 'n038', label: { ja: '第38巻', en: 'Vol. 38' }, sub: '' },
       ]},
-      { id: 's_ch9', title: { ja: '第九章「名も無き星の光」', en: '第九章「名も無き星の光」' }, icon: '📗', items: [
-        { id: 'n039', label: '第39巻', sub: '第九章 名も無き星の光（1）' },
-        { id: 'n040', label: '第40巻', sub: '第九章 名も無き星の光（2）' },
-        { id: 'n041', label: '第41巻', sub: '第九章 名も無き星の光（3）' },
-        { id: 'n042', label: '第42巻', sub: '第九章 名も無き星の光（4）' },
-        { id: 'n043', label: '第43巻', sub: '第九章 名も無き星の光（終幕）' },
+      { id: 's_ch9', title: { ja: '第九章「名も無き星の光」', en: 'Arc 9 "The Light of Nameless Stars"' }, icon: '📗', items: [
+        { id: 'n039', label: { ja: '第39巻', en: 'Vol. 39' }, sub: '' },
+        { id: 'n040', label: { ja: '第40巻', en: 'Vol. 40' }, sub: '' },
+        { id: 'n041', label: { ja: '第41巻', en: 'Vol. 41' }, sub: '' },
+        { id: 'n042', label: { ja: '第42巻', en: 'Vol. 42' }, sub: '' },
+        { id: 'n043', label: { ja: '第43巻', en: 'Vol. 43' }, sub: '' },
       ]},
-      { id: 's_ch10', title: { ja: '第十章「獅子王の国」', en: '第十章「獅子王の国」' }, icon: '📗', items: [
-        { id: 'n044', label: '第44巻', sub: '第十章 獅子王の国（1）（連載中）' },
+      { id: 's_ch10', title: { ja: '第十章「獅子王の国」', en: 'Arc 10 "The Land of the Lion King"' }, icon: '📗', items: [
+        { id: 'n044', label: { ja: '第44巻', en: 'Vol. 44' }, sub: '' },
       ]},
     ]
   },
@@ -642,46 +646,34 @@ const TABS = [
     id: 'web',
     sections: [
       { id: 'w_main', title: { ja: 'Web小説版（本編）', en: 'Web Novel (Main Story)' }, icon: '💻', items: [
-        { id: 'w001', label: '第一章', sub: '怒涛の一日目' },
-        { id: 'w002', label: '第二章', sub: '激動の一週間' },
-        { id: 'w_wanday1', label: '番外編「わんでい」', sub: '第二章〜第三章間の番外編' },
-        { id: 'w003', label: '第三章', sub: '再来の王都' },
-        { id: 'w004', label: '第四章', sub: '永遠の契約' },
-        { id: 'w_wanday2', label: '番外編「わんでいⅡ」', sub: '第四章〜第五章間の番外編' },
-        { id: 'w005', label: '第五章', sub: '歴史を刻む星々' },
-        { id: 'w006', label: '第六章', sub: '記憶の回廊' },
-        { id: 'w007', label: '第七章', sub: '狼の国' },
-        { id: 'w008', label: '第八章', sub: 'ヴィンセント・ヴォラキア' },
-        { id: 'w009', label: '第九章', sub: '名も無き星の光' },
-        { id: 'w010', label: '第十章', sub: '獅子王の国（連載中）' },
+        { id: 'w001', label: { ja: '第一章', en: 'Chapter 1' }, sub: { ja: '怒涛の一日目', en: 'A Stormy First Day' } },
+        { id: 'w002', label: { ja: '第二章', en: 'Chapter 2' }, sub: { ja: '激動の一週間', en: 'A Week of Turmoil' } },
+        { id: 'w_wanday1', label: { ja: '番外編「わんでい」', en: 'Side Story "One Day"' }, sub: { ja: '第二章〜第三章間の番外編', en: 'Side story between Ch.2 and Ch.3' } },
+        { id: 'w003', label: { ja: '第三章', en: 'Chapter 3' }, sub: { ja: '再来の王都（※『とある殉教者の訃報』含む）', en: 'Return to the Royal Capital' } },
+        { id: 'w004', label: { ja: '第四章', en: 'Chapter 4' }, sub: { ja: '永遠の契約', en: 'The Eternal Contract' } },
+        { id: 'w_wanday2', label: { ja: '番外編「わんでいⅡ」', en: 'Side Story "One Day II"' }, sub: { ja: '第四章〜第五章間の番外編', en: 'Side story between Ch.4 and Ch.5' } },
+        { id: 'w005', label: { ja: '第五章', en: 'Chapter 5' }, sub: { ja: '歴史を刻む星々', en: 'Stars That Engrave History' } },
+        { id: 'w006', label: { ja: '第六章', en: 'Chapter 6' }, sub: { ja: '記憶の回廊', en: 'The Corridor of Memory' } },
+        { id: 'w007', label: { ja: '第七章', en: 'Chapter 7' }, sub: { ja: '狼の国', en: 'Land of the Wolves' } },
+        { id: 'w008', label: { ja: '第八章', en: 'Chapter 8' }, sub: { ja: 'ヴィンセント・ヴォラキア', en: 'Vincent Volakia' } },
+        { id: 'w009', label: { ja: '第九章', en: 'Chapter 9' }, sub: { ja: '名も無き星の光', en: 'Light of Nameless Stars' } },
+        { id: 'w010', label: { ja: '第十章', en: 'Chapter 10' }, sub: { ja: '獅子王の国（最新話まで）', en: 'Land of the Lion King (up to latest chapter)' } },
       ]},
       { id: 'w_if', title: { ja: 'IFストーリー', en: 'IF Stories' }, icon: '🌀', items: [
-        { id: 'if001', label: 'ナツキ・レム', sub: 'IFストーリー' },
-        { id: 'if002', label: '胡蝶之夢', sub: 'IFストーリー' },
-        { id: 'if003', label: 'ゼロカラカサネルイセカイセイカツ', sub: 'IFストーリー' },
-        { id: 'if004', label: 'ゼロカラアヤマツイセカイセイカツ', sub: 'IFストーリー' },
-        { id: 'if005', label: 'ゼロカラツギハグイセカイセイカツ', sub: 'IFストーリー' },
-        { id: 'if006', label: 'ゼロカラミマガウイセカイセイカツ', sub: 'IFストーリー' },
-        { id: 'if007', label: 'ゼロカラミマガウイセカイセイカツⅡ', sub: 'IFストーリー' },
-        { id: 'if008', label: 'ゼロカラアザムクイセカイセイカツ', sub: 'IFストーリー' },
-        { id: 'if009', label: 'ゼロカラササゲルイセカイセイカツ', sub: 'IFストーリー' },
-        { id: 'if010', label: '学園リゼロ！ 1時間目！', sub: 'IFストーリー' },
-        { id: 'if011', label: '学園リゼロ！ 2時間目！', sub: 'IFストーリー' },
-        { id: 'if012', label: '学園リゼロ！ 3時間目！', sub: 'IFストーリー' },
-        { id: 'if013', label: '学園リゼロ！ 4時間目！', sub: 'IFストーリー' },
-      ]},
-    ]
-  },
-  {
-    id: 'ex',
-    sections: [
-      { id: 'ex_main', title: { ja: 'EXシリーズ', en: 'EX Series' }, icon: '⚔️', items: [
-        { id: 'ex001', label: 'EX1「獅子王の見た夢」', sub: '' },
-        { id: 'ex002', label: 'EX2「剣鬼恋歌」', sub: '' },
-        { id: 'ex003', label: 'EX3「剣鬼恋譚」', sub: '' },
-        { id: 'ex004', label: 'EX4「最優紀行」', sub: '' },
-        { id: 'ex005', label: 'EX5「緋色姫譚」', sub: '' },
-        { id: 'ex006', label: 'EX6「剣鬼戦歌」', sub: '' },
+        { id: 'if001', label: { ja: 'ナツキ・レム', en: 'Natsuki Rem' }, sub: { ja: '2013 エイプリルフール（※『鬼も幸福も』『フォーチュンロール・ラプソディ』『ナツキ・リゲル』『フォーチュン・フィッシュヘッドツリー』『フォーチュン・セツブンホロゥ』含む）', en: "2013 April Fool's" } },
+        { id: 'if002', label: { ja: '胡蝶之夢', en: 'Butterfly Dream' }, sub: { ja: '2014 エイプリルフール', en: "2014 April Fool's" } },
+        { id: 'if003', label: { ja: 'ゼロカラカサネルイセカイセイカツ', en: 'Starting Over in Another World' }, sub: { ja: '2016 エイプリルフール', en: "2016 April Fool's" } },
+        { id: 'if004', label: { ja: 'ゼロカラアヤマツイセカイセイカツ', en: 'Erring in Another World' }, sub: { ja: '2017 エイプリルフール', en: "2017 April Fool's" } },
+        { id: 'if004b', label: { ja: 'ゼロカラオボレルイセカイセイカツ', en: 'Drowning in Another World' }, sub: { ja: '2018 エイプリルフール', en: "2018 April Fool's" } },
+        { id: 'if005', label: { ja: 'ゼロカラツギハグイセカイセイカツ', en: 'Patching Together in Another World' }, sub: { ja: '2019 エイプリルフール', en: "2019 April Fool's" } },
+        { id: 'if006', label: { ja: 'ゼロカラミマガウイセカイセイカツ', en: 'Lost in Another World' }, sub: { ja: '2022 エイプリルフール', en: "2022 April Fool's" } },
+        { id: 'if007', label: { ja: 'ゼロカラミマガウイセカイセイカツⅡ', en: 'Lost in Another World II' }, sub: { ja: '2023 エイプリルフール', en: "2023 April Fool's" } },
+        { id: 'if008', label: { ja: 'ゼロカラアザムクイセカイセイカツ', en: 'Betraying in Another World' }, sub: { ja: '2025 エイプリルフール', en: "2025 April Fool's" } },
+        { id: 'if009', label: { ja: 'ゼロカラササゲルイセカイセイカツ', en: 'Devoted in Another World' }, sub: { ja: '2026 エイプリルフール', en: "2026 April Fool's" } },
+        { id: 'if010', label: { ja: '学園リゼロ！　１時間目！', en: 'Re:Zero Campus! Class 1' }, sub: { ja: '2015 エイプリルフール', en: "2015 April Fool's" } },
+        { id: 'if011', label: { ja: '学園リゼロ！　２時間目！', en: 'Re:Zero Campus! Class 2' }, sub: '' },
+        { id: 'if012', label: { ja: '学園リゼロ！　３時間目！', en: 'Re:Zero Campus! Class 3' }, sub: { ja: '2020 エイプリルフール', en: "2020 April Fool's" } },
+        { id: 'if013', label: { ja: '学園リゼロ！　４時間目！', en: 'Re:Zero Campus! Class 4' }, sub: { ja: '2021 エイプリルフール', en: "2021 April Fool's" } },
       ]},
     ]
   },
@@ -689,49 +681,45 @@ const TABS = [
     id: 'short',
     sections: [
       { id: 'sh_main', title: { ja: '短編集', en: 'Short Story Collection' }, icon: '📄', items: [
-        { id: 'sh001', label: '短編集 第1巻', sub: '' },
-        { id: 'sh002', label: '短編集 第2巻', sub: '' },
-        { id: 'sh003', label: '短編集 第3巻', sub: '' },
-        { id: 'sh004', label: '短編集 第4巻', sub: '' },
-        { id: 'sh005', label: '短編集 第5巻', sub: '' },
-        { id: 'sh006', label: '短編集 第6巻', sub: '' },
-        { id: 'sh007', label: '短編集 第7巻', sub: '' },
-        { id: 'sh008', label: '短編集 第8巻', sub: '' },
-        { id: 'sh009', label: '短編集 第9巻', sub: '' },
-        { id: 'sh010', label: '短編集 第10巻', sub: '' },
-        { id: 'sh011', label: '短編集 第11巻', sub: '' },
-        { id: 'sh012', label: '短編集 第12巻', sub: '' },
-        { id: 'sh013', label: '短編集 第13巻', sub: '' },
+        { id: 'sh001', label: { ja: '短編集 第1巻', en: 'Short Story Vol. 1' }, sub: '' },
+        { id: 'sh002', label: { ja: '短編集 第2巻', en: 'Short Story Vol. 2' }, sub: '' },
+        { id: 'sh003', label: { ja: '短編集 第3巻', en: 'Short Story Vol. 3' }, sub: '' },
+        { id: 'sh004', label: { ja: '短編集 第4巻', en: 'Short Story Vol. 4' }, sub: '' },
+        { id: 'sh005', label: { ja: '短編集 第5巻', en: 'Short Story Vol. 5' }, sub: '' },
+        { id: 'sh006', label: { ja: '短編集 第6巻', en: 'Short Story Vol. 6' }, sub: '' },
+        { id: 'sh007', label: { ja: '短編集 第7巻', en: 'Short Story Vol. 7' }, sub: '' },
+        { id: 'sh008', label: { ja: '短編集 第8巻', en: 'Short Story Vol. 8' }, sub: '' },
+        { id: 'sh009', label: { ja: '短編集 第9巻', en: 'Short Story Vol. 9' }, sub: '' },
+        { id: 'sh010', label: { ja: '短編集 第10巻', en: 'Short Story Vol. 10' }, sub: '' },
+        { id: 'sh011', label: { ja: '短編集 第11巻', en: 'Short Story Vol. 11' }, sub: '' },
+        { id: 'sh012', label: { ja: '短編集 第12巻', en: 'Short Story Vol. 12' }, sub: '' },
+        { id: 'sh013', label: { ja: '短編集 第13巻', en: 'Short Story Vol. 13' }, sub: '' },
+      ]},
+      { id: 'sh_ex', title: { ja: 'EXシリーズ', en: 'EX Series' }, icon: '⚔️', items: [
+        { id: 'ex001', label: { ja: 'EX1「獅子王の見た夢」', en: 'EX1 "The Dream of the Lion King"' }, sub: '' },
+        { id: 'ex002', label: { ja: 'EX2「剣鬼恋歌」', en: 'EX2 - The Sword Devil Love Song' }, sub: '' },
+        { id: 'ex003', label: { ja: 'EX3「剣鬼恋譚」', en: 'EX3 - The Sword Devil Love Tale' }, sub: '' },
+        { id: 'ex004', label: { ja: 'EX4「最優紀行」', en: 'EX4 "The Greatest Journey"' }, sub: '' },
+        { id: 'ex005', label: { ja: 'EX5「緋色姫譚」', en: 'EX5 "The Scarlet Princess Tale"' }, sub: '' },
+        { id: 'ex006', label: { ja: 'EX6「剣鬼戦歌」', en: 'EX6 - The Sword Devil Battle Song' }, sub: '' },
       ]},
       { id: 'sh_zeropedia', title: { ja: 'Re:zeropedia', en: 'Re:zeropedia' }, icon: '📖', items: [
-        { id: 'zp001', label: 'Re:zeropedia', sub: '' },
-        { id: 'zp002', label: 'Re:zeropedia 2', sub: '' },
-      ]},
-      { id: 'sh_bluray', title: { ja: '円盤特典小説', en: 'Blu-ray Bonus Novels' }, icon: '💿', items: [
-        { id: 'bd001', label: 'Re:ゼロから始める前日譚 氷結の絆', sub: '円盤特典' },
-        { id: 'bd002', label: 'Re:ゼロから始める前日譚 隠れ里の鬼姉妹', sub: '円盤特典' },
-        { id: 'bd003', label: 'Re:ゼロから始める前日譚 陣営結成秘話', sub: '円盤特典' },
-        { id: 'bd004', label: 'Re:IFから始める異世界生活 ナツキ・レム', sub: '円盤特典' },
-        { id: 'bd005', label: 'Re:ゼロから始める前日譚 アポカリプスガールズ', sub: '円盤特典' },
-        { id: 'bd006', label: 'Re:ゼロから始める前日譚 過ぎ去りし日々を愛して', sub: '円盤特典' },
-        { id: 'bd007', label: 'Re:IFから始める異世界生活 ゼロカラカサネルイセカイセイカツ', sub: '円盤特典' },
-        { id: 'bd008', label: "Re:ゼロから始める異世界生活Ex『劇場前善意』", sub: '円盤特典' },
-        { id: 'bd009', label: "Re:ゼロから始める異世界生活Ex『SCORPION TALE』", sub: '円盤特典' },
-        { id: 'bd010', label: 'Re:IFから始める異世界生活 ゼロカラアヤマツイセカイセイカツ', sub: '円盤特典' },
+        { id: 'zp001', label: { ja: 'Re:zeropedia', en: 'Re:zeropedia' }, sub: '' },
+        { id: 'zp002', label: { ja: 'Re:zeropedia 2', en: 'Re:zeropedia 2' }, sub: '' },
       ]},
       { id: 'sh_other', title: { ja: '書籍その他', en: 'Other Books' }, icon: '📦', items: [
-        { id: 'bo001', label: 'Re:ゼロから始める異世界生活 大塚真一郎 Art Works Re：BOX', sub: '' },
-        { id: 'bo002', label: 'Re:ゼロから始める異世界生活 大塚真一郎 Art Works Re：BOX 2nd', sub: '' },
+        { id: 'bo001', label: { ja: 'Art Works Re：BOX', en: 'Art Works Re:BOX' }, sub: '' },
+        { id: 'bo002', label: { ja: 'Art Works Re：BOX 2nd', en: 'Art Works Re:BOX 2nd' }, sub: '' },
       ]},
       { id: 'sh_manga', title: { ja: '漫画', en: 'Manga' }, icon: '📕', items: [
-        { id: 'mg001', label: '第一章 王都の一日編', sub: '漫画版' },
-        { id: 'mg002', label: '第二章 屋敷の一週間編', sub: '漫画版' },
-        { id: 'mg003', label: '第三章 Truth of Zero', sub: '漫画版' },
-        { id: 'mg004', label: '第四章 聖域と強欲の魔女', sub: '漫画版' },
-        { id: 'mg005', label: '第五章 水の都と英雄の詩', sub: '漫画版' },
-        { id: 'mg006', label: '剣鬼恋歌 〜真銘譚〜', sub: '漫画版' },
-        { id: 'mg007', label: '氷結の絆（漫画版）', sub: '漫画版' },
-        { id: 'mg008', label: '公式アンソロジーコミック', sub: '漫画版' },
+        { id: 'manga1', label: { ja: 'Re:ゼロから始める異世界生活 第一章 王都の一日編', en: 'Re:ZERO Chapter 1: A Day in the Capital' }, sub: '' },
+        { id: 'manga2', label: { ja: 'Re:ゼロから始める異世界生活 第二章 屋敷の一週間編', en: 'Re:ZERO Chapter 2: A Week at the Mansion' }, sub: '' },
+        { id: 'manga3', label: { ja: 'Re:ゼロから始める異世界生活 第三章 Truth of Zero', en: 'Re:ZERO Chapter 3: Truth of Zero' }, sub: '' },
+        { id: 'manga4', label: { ja: 'Re:ゼロから始める異世界生活 第四章 聖域と強欲の魔女', en: 'Re:ZERO Chapter 4: The Sanctuary and the Witch of Greed' }, sub: '' },
+        { id: 'manga5', label: { ja: 'Re:ゼロから始める異世界生活 第五章 水の都と英雄の詩', en: "Re:ZERO Chapter 5: The City of Water and the Hero\'s Epic" }, sub: '' },
+        { id: 'manga6', label: { ja: '剣鬼恋歌　Re:ゼロから始める異世界生活†真銘譚', en: 'Sword Demon Love Ballad: Re:ZERO' }, sub: '' },
+        { id: 'manga7', label: { ja: 'Re:ゼロから始める異世界生活 氷結の絆', en: 'Re:ZERO: Frozen Bonds' }, sub: '' },
+        { id: 'manga8', label: { ja: 'Re:ゼロから始める異世界生活 公式アンソロジーコミック', en: 'Re:ZERO Official Anthology Comic' }, sub: '' },
       ]},
     ]
   },
@@ -739,97 +727,103 @@ const TABS = [
     id: 'anime',
     sections: [
       { id: 'a_s1', title: { ja: '第1期（2016年）全25話', en: 'Season 1 (2016) — 25 eps' }, icon: '✨', items: [
-        { id: 'a1_01', label: '第1話（S1-1話）', sub: '始まりの終わりと終わりの始まり' },
-        { id: 'a1_02', label: '第2話（S1-2話）', sub: '再会の魔女' },
-        { id: 'a1_03', label: '第3話（S1-3話）', sub: 'ゼロから始まる異世界生活' },
-        { id: 'a1_04', label: '第4話（S1-4話）', sub: 'ロズワール邸の団欒' },
-        { id: 'a1_05', label: '第5話（S1-5話）', sub: '約束した朝は遠く' },
-        { id: 'a1_06', label: '第6話（S1-6話）', sub: '鎖の音' },
-        { id: 'a1_07', label: '第7話（S1-7話）', sub: 'ナツキ・スバルのリスタート' },
-        { id: 'a1_08', label: '第8話（S1-8話）', sub: '泣いて泣き喚いて泣き止んだから' },
-        { id: 'a1_09', label: '第9話（S1-9話）', sub: '勇気の意味' },
-        { id: 'a1_10', label: '第10話（S1-10話）', sub: '鬼がかったやり方' },
-        { id: 'a1_11', label: '第11話（S1-11話）', sub: 'レム' },
-        { id: 'a_ova_ms', label: 'Memory Snow（OVA）', sub: '劇場版OVA 2018年' },
-        { id: 'a1_12', label: '第12話（S1-12話）', sub: '再来の王都' },
-        { id: 'a1_13', label: '第13話（S1-13話）', sub: '自称騎士ナツキ・スバル' },
-        { id: 'a1_14', label: '第14話（S1-14話）', sub: '絶望という病' },
-        { id: 'a1_15', label: '第15話（S1-15話）', sub: '狂気の外側' },
-        { id: 'a1_16', label: '第16話（S1-16話）', sub: '豚の欲望' },
-        { id: 'a1_17', label: '第17話（S1-17話）', sub: '醜態の果てに' },
-        { id: 'a1_18', label: '第18話（S1-18話）', sub: 'ゼロから' },
-        { id: 'a1_19', label: '第19話（S1-19話）', sub: '白鯨攻略戦' },
-        { id: 'a1_20', label: '第20話（S1-20話）', sub: 'ヴィルヘルム・ヴァン・アストレア' },
-        { id: 'a1_21', label: '第21話（S1-21話）', sub: '絶望に抗う賭け' },
-        { id: 'a1_22', label: '第22話（S1-22話）', sub: '怠惰一閃' },
-        { id: 'a1_23', label: '第23話（S1-23話）', sub: '悪辣なる怠惰' },
-        { id: 'a1_24', label: '第24話（S1-24話）', sub: '自称騎士と最優の騎士' },
-        { id: 'a1_25', label: '第25話（S1-25話）', sub: 'ただそれだけの物語' },
+        { id: 'a1_01', label: { ja: '第1話（S1-1話）', en: 'Ep. 1 (S1-E1)' }, sub: { ja: '始まりの終わりと終わりの始まり', en: 'The End of the Beginning and the Beginning of the End' } },
+        { id: 'a1_02', label: { ja: '第2話（S1-2話）', en: 'Ep. 2 (S1-E2)' }, sub: { ja: '再会の魔女', en: 'Witch of the Reunion' } },
+        { id: 'a1_03', label: { ja: '第3話（S1-3話）', en: 'Ep. 3 (S1-E3)' }, sub: { ja: 'ゼロから始まる異世界生活', en: 'Starting Life in Another World from Zero' } },
+        { id: 'a1_04', label: { ja: '第4話（S1-4話）', en: 'Ep. 4 (S1-E4)' }, sub: { ja: 'ロズワール邸の団欒', en: "The Happy Family at Roswaal's Manor" } },
+        { id: 'a1_05', label: { ja: '第5話（S1-5話）', en: 'Ep. 5 (S1-E5)' }, sub: { ja: '約束した朝は遠く', en: 'That Promise, on That Morning' } },
+        { id: 'a1_06', label: { ja: '第6話（S1-6話）', en: 'Ep. 6 (S1-E6)' }, sub: { ja: '鎖の音', en: 'The Sound of Chains' } },
+        { id: 'a1_07', label: { ja: '第7話（S1-7話）', en: 'Ep. 7 (S1-E7)' }, sub: { ja: 'ナツキ・スバルのリスタート', en: "Natsuki Subaru's Restart" } },
+        { id: 'a1_08', label: { ja: '第8話（S1-8話）', en: 'Ep. 8 (S1-E8)' }, sub: { ja: '泣いて泣き喚いて泣き止んだから', en: 'Crying Aloud, Crying In, Crying Out' } },
+        { id: 'a1_09', label: { ja: '第9話（S1-9話）', en: 'Ep. 9 (S1-E9)' }, sub: { ja: '勇気の意味', en: 'The Meaning of Courage' } },
+        { id: 'a1_10', label: { ja: '第10話（S1-10話）', en: 'Ep. 10 (S1-E10)' }, sub: { ja: '鬼がかったやり方', en: "A Demon's Method" } },
+        { id: 'a1_11', label: { ja: '第11話（S1-11話）', en: 'Ep. 11 (S1-E11)' }, sub: { ja: 'レム', en: 'Rem' } },
+        { id: 'a1_12', label: { ja: '第12話（S1-12話）', en: 'Ep. 12 (S1-E12)' }, sub: { ja: '再来の王都', en: 'Return to the Royal Capital' } },
+        { id: 'a1_13', label: { ja: '第13話（S1-13話）', en: 'Ep. 13 (S1-E13)' }, sub: { ja: '自称騎士ナツキ・スバル', en: 'Self-Styled Knight Natsuki Subaru' } },
+        { id: 'a1_14', label: { ja: '第14話（S1-14話）', en: 'Ep. 14 (S1-E14)' }, sub: { ja: '絶望という病', en: 'The Disease Called Despair' } },
+        { id: 'a1_15', label: { ja: '第15話（S1-15話）', en: 'Ep. 15 (S1-E15)' }, sub: { ja: '狂気の外側', en: 'Outside the Realm of Madness' } },
+        { id: 'a1_16', label: { ja: '第16話（S1-16話）', en: 'Ep. 16 (S1-E16)' }, sub: { ja: '豚の欲望', en: "The Pig's Greed" } },
+        { id: 'a1_17', label: { ja: '第17話（S1-17話）', en: 'Ep. 17 (S1-E17)' }, sub: { ja: '醜態の果てに', en: 'At the End of Disgrace' } },
+        { id: 'a1_18', label: { ja: '第18話（S1-18話）', en: 'Ep. 18 (S1-E18)' }, sub: { ja: 'ゼロから', en: 'From Zero' } },
+        { id: 'a1_19', label: { ja: '第19話（S1-19話）', en: 'Ep. 19 (S1-E19)' }, sub: { ja: '白鯨攻略戦', en: 'Battle Against the White Whale' } },
+        { id: 'a1_20', label: { ja: '第20話（S1-20話）', en: 'Ep. 20 (S1-E20)' }, sub: { ja: 'ヴィルヘルム・ヴァン・アストレア', en: 'Wilhelm van Astrea' } },
+        { id: 'a1_21', label: { ja: '第21話（S1-21話）', en: 'Ep. 21 (S1-E21)' }, sub: { ja: '絶望に抗う賭け', en: 'A Bet Against Despair' } },
+        { id: 'a1_22', label: { ja: '第22話（S1-22話）', en: 'Ep. 22 (S1-E22)' }, sub: { ja: '怠惰一閃', en: "Sloth's Flash" } },
+        { id: 'a1_23', label: { ja: '第23話（S1-23話）', en: 'Ep. 23 (S1-E23)' }, sub: { ja: '悪辣なる怠惰', en: 'Wicked Sloth' } },
+        { id: 'a1_24', label: { ja: '第24話（S1-24話）', en: 'Ep. 24 (S1-E24)' }, sub: { ja: '自称騎士と最優の騎士', en: 'The Self-Styled Knight and the Greatest Knight' } },
+        { id: 'a1_25', label: { ja: '第25話（S1-25話）', en: 'Ep. 25 (S1-E25)' }, sub: { ja: 'ただそれだけの物語', en: 'Just That, and Nothing Else' } },
       ]},
       { id: 'a_s2', title: { ja: '第2期（2020〜2021年）全25話', en: 'Season 2 (2020-2021) — 25 eps' }, icon: '✨', items: [
-        { id: 'a2_01', label: '第26話（S2-1話）', sub: 'それぞれの誓い' },
-        { id: 'a2_02', label: '第27話（S2-2話）', sub: '次なる場所' },
-        { id: 'a2_03', label: '第28話（S2-3話）', sub: '待ちかねた再会' },
-        { id: 'a2_04', label: '第29話（S2-4話）', sub: '親子' },
-        { id: 'a2_05', label: '第30話（S2-5話）', sub: '踏み出した一歩' },
-        { id: 'a2_06', label: '第31話（S2-6話）', sub: '少女の福音' },
-        { id: 'a2_07', label: '第32話（S2-7話）', sub: 'ユージン' },
-        { id: 'a2_08', label: '第33話（S2-8話）', sub: '命の価値' },
-        { id: 'a2_09', label: '第34話（S2-9話）', sub: 'らぶらぶらぶらぶらぶらぶゆー' },
-        { id: 'a2_10', label: '第35話（S2-10話）', sub: '地獄なら知っている' },
-        { id: 'a2_11', label: '第36話（S2-11話）', sub: '死の味' },
-        { id: 'a2_12', label: '第37話（S2-12話）', sub: '魔女たちの茶会' },
-        { id: 'a2_13', label: '第38話（S2-13話）', sub: '泣きたくなる音' },
-        { id: 'a2_14', label: '第39話（S2-14話）', sub: 'STRAIGHT BET' },
-        { id: 'a2_15', label: '第40話（S2-15話）', sub: 'オットー・スーウェン／信じる理由' },
-        { id: 'a2_16', label: '第41話（S2-16話）', sub: 'クウェインの石は一人じゃ上がらない' },
-        { id: 'a2_17', label: '第42話（S2-17話）', sub: '記憶の旅路' },
-        { id: 'a2_18', label: '第43話（S2-18話）', sub: '平家星の笑った日' },
-        { id: 'a2_19', label: '第44話（S2-19話）', sub: 'エリオール大森林の永久凍土' },
-        { id: 'a2_20', label: '第45話（S2-20話）', sub: '聖域の始まりと、崩壊の始まり' },
-        { id: 'a2_21', label: '第46話（S2-21話）', sub: '咆哮の再会' },
-        { id: 'a2_22', label: '第47話（S2-22話）', sub: '水面に映る幸せ' },
-        { id: 'a2_23', label: '第48話（S2-23話）', sub: '血と臓物まで愛して' },
-        { id: 'a2_24', label: '第49話（S2-24話）', sub: '俺を選べ' },
-        { id: 'a2_25', label: '第50話（S2-25話）', sub: '月下、出鱈目なステップ' },
+        { id: 'a2_01', label: { ja: '第26話（S2-1話）', en: 'Ep. 26 (S2-E1)' }, sub: { ja: 'それぞれの誓い', en: "Each One's Vow" } },
+        { id: 'a2_02', label: { ja: '第27話（S2-2話）', en: 'Ep. 27 (S2-E2)' }, sub: { ja: '次なる場所', en: 'The Next Place' } },
+        { id: 'a2_03', label: { ja: '第28話（S2-3話）', en: 'Ep. 28 (S2-E3)' }, sub: { ja: '待ちかねた再会', en: 'A Long-Awaited Reunion' } },
+        { id: 'a2_04', label: { ja: '第29話（S2-4話）', en: 'Ep. 29 (S2-E4)' }, sub: { ja: '親子', en: 'Parent and Child' } },
+        { id: 'a2_05', label: { ja: '第30話（S2-5話）', en: 'Ep. 30 (S2-E5)' }, sub: { ja: '踏み出した一歩', en: 'A Step Forward' } },
+        { id: 'a2_06', label: { ja: '第31話（S2-6話）', en: 'Ep. 31 (S2-E6)' }, sub: { ja: '少女の福音', en: "A Girl's Gospel" } },
+        { id: 'a2_07', label: { ja: '第32話（S2-7話）', en: 'Ep. 32 (S2-E7)' }, sub: { ja: 'ユージン', en: 'Eugene' } },
+        { id: 'a2_08', label: { ja: '第33話（S2-8話）', en: 'Ep. 33 (S2-E8)' }, sub: { ja: '命の価値', en: 'The Value of Life' } },
+        { id: 'a2_09', label: { ja: '第34話（S2-9話）', en: 'Ep. 34 (S2-E9)' }, sub: { ja: 'らぶらぶらぶらぶらぶらぶゆー', en: 'Love Love Love Love Love Love You' } },
+        { id: 'a2_10', label: { ja: '第35話（S2-10話）', en: 'Ep. 35 (S2-E10)' }, sub: { ja: '地獄なら知っている', en: 'I Know Hell' } },
+        { id: 'a2_11', label: { ja: '第36話（S2-11話）', en: 'Ep. 36 (S2-E11)' }, sub: { ja: '死の味', en: 'The Taste of Death' } },
+        { id: 'a2_12', label: { ja: '第37話（S2-12話）', en: 'Ep. 37 (S2-E12)' }, sub: { ja: '魔女たちの茶会', en: "The Witches' Tea Party" } },
+        { id: 'a2_13', label: { ja: '第38話（S2-13話）', en: 'Ep. 38 (S2-E13)' }, sub: { ja: '泣きたくなる音', en: 'A Sound That Makes You Want to Cry' } },
+        { id: 'a2_14', label: { ja: '第39話（S2-14話）', en: 'Ep. 39 (S2-E14)' }, sub: { ja: 'STRAIGHT BET', en: 'STRAIGHT BET' } },
+        { id: 'a2_15', label: { ja: '第40話（S2-15話）', en: 'Ep. 40 (S2-E15)' }, sub: { ja: 'オットー・スーウェン／信じる理由', en: 'Otto Suwén / The Reason to Believe' } },
+        { id: 'a2_16', label: { ja: '第41話（S2-16話）', en: 'Ep. 41 (S2-E16)' }, sub: { ja: 'クウェインの石は一人じゃ上がらない', en: 'The Stone of Quain Cannot Be Raised Alone' } },
+        { id: 'a2_17', label: { ja: '第42話（S2-17話）', en: 'Ep. 42 (S2-E17)' }, sub: { ja: '記憶の旅路', en: 'Journey Through Memories' } },
+        { id: 'a2_18', label: { ja: '第43話（S2-18話）', en: 'Ep. 43 (S2-E18)' }, sub: { ja: '平家星の笑った日', en: 'The Day the Heike Star Smiled' } },
+        { id: 'a2_19', label: { ja: '第44話（S2-19話）', en: 'Ep. 44 (S2-E19)' }, sub: { ja: 'エリオール大森林の永久凍土', en: 'Permafrost of the Elior Great Forest' } },
+        { id: 'a2_20', label: { ja: '第45話（S2-20話）', en: 'Ep. 45 (S2-E20)' }, sub: { ja: '聖域の始まりと、崩壊の始まり', en: 'The Beginning of the Sanctuary and Its Collapse' } },
+        { id: 'a2_21', label: { ja: '第46話（S2-21話）', en: 'Ep. 46 (S2-E21)' }, sub: { ja: '咆哮の再会', en: 'A Roaring Reunion' } },
+        { id: 'a2_22', label: { ja: '第47話（S2-22話）', en: 'Ep. 47 (S2-E22)' }, sub: { ja: '水面に映る幸せ', en: 'Happiness Reflected on the Water' } },
+        { id: 'a2_23', label: { ja: '第48話（S2-23話）', en: 'Ep. 48 (S2-E23)' }, sub: { ja: '血と臓物まで愛して', en: 'Love Me Down to My Blood and Guts' } },
+        { id: 'a2_24', label: { ja: '第49話（S2-24話）', en: 'Ep. 49 (S2-E24)' }, sub: { ja: '俺を選べ', en: 'Choose Me' } },
+        { id: 'a2_25', label: { ja: '第50話（S2-25話）', en: 'Ep. 50 (S2-E25)' }, sub: { ja: '月下、出鱈目なステップ', en: 'Under the Moon, a Crazy Step' } },
       ]},
       { id: 'a_s3', title: { ja: '第3期（2024年〜）全16話', en: 'Season 3 (2024-) — 16 eps' }, icon: '✨', items: [
-        { id: 'a3_01', label: '第51話（S3-1話）', sub: '劇場型悪意' },
-        { id: 'a3_02', label: '第52話（S3-2話）', sub: '氷炎の結末' },
-        { id: 'a3_03', label: '第53話（S3-3話）', sub: 'ゴージャス・タイガー' },
-        { id: 'a3_04', label: '第54話（S3-4話）', sub: '都市庁舎奪還作戦' },
-        { id: 'a3_05', label: '第55話（S3-5話）', sub: '濁流' },
-        { id: 'a3_06', label: '第56話（S3-6話）', sub: '騎士の条件' },
-        { id: 'a3_07', label: '第57話（S3-7話）', sub: '最も新しい英雄と最も古い英雄' },
-        { id: 'a3_08', label: '第58話（S3-8話）', sub: 'いつか好きになる人' },
-        { id: 'a3_09', label: '第59話（S3-9話）', sub: '混戦都市' },
-        { id: 'a3_10', label: '第60話（S3-10話）', sub: '強欲攻略戦' },
-        { id: 'a3_11', label: '第61話（S3-11話）', sub: 'リリアナ・マスカレード' },
-        { id: 'a3_12', label: '第62話（S3-12話）', sub: 'レグルス・コルニアス' },
-        { id: 'a3_13', label: '第63話（S3-13話）', sub: '戦士の称賛' },
-        { id: 'a3_14', label: '第64話（S3-14話）', sub: 'テレシア・ヴァン・アストレア' },
-        { id: 'a3_15', label: '第65話（S3-15話）', sub: '醜悪なる晩餐会' },
-        { id: 'a3_16', label: '第66話（S3-16話）', sub: 'プリステラ攻防戦リザルト' },
+        { id: 'a3_01', label: { ja: '第51話（S3-1話）', en: 'Ep. 51 (S3-E1)' }, sub: { ja: '劇場型悪意', en: 'Theatrical Malice' } },
+        { id: 'a3_02', label: { ja: '第52話（S3-2話）', en: 'Ep. 52 (S3-E2)' }, sub: { ja: '氷炎の結末', en: 'The End of Ice and Flames' } },
+        { id: 'a3_03', label: { ja: '第53話（S3-3話）', en: 'Ep. 53 (S3-E3)' }, sub: { ja: 'ゴージャス・タイガー', en: 'Gorgeous Tiger' } },
+        { id: 'a3_04', label: { ja: '第54話（S3-4話）', en: 'Ep. 54 (S3-E4)' }, sub: { ja: '都市庁舎奪還作戦', en: 'Operation Retake City Hall' } },
+        { id: 'a3_05', label: { ja: '第55話（S3-5話）', en: 'Ep. 55 (S3-E5)' }, sub: { ja: '濁流', en: 'Turbid Current' } },
+        { id: 'a3_06', label: { ja: '第56話（S3-6話）', en: 'Ep. 56 (S3-E6)' }, sub: { ja: '騎士の条件', en: 'Conditions of a Knight' } },
+        { id: 'a3_07', label: { ja: '第57話（S3-7話）', en: 'Ep. 57 (S3-E7)' }, sub: { ja: '最も新しい英雄と最も古い英雄', en: 'The Newest Hero and the Oldest Hero' } },
+        { id: 'a3_08', label: { ja: '第58話（S3-8話）', en: 'Ep. 58 (S3-E8)' }, sub: { ja: 'いつか好きになる人', en: "The Person You'll Love Someday" } },
+        { id: 'a3_09', label: { ja: '第59話（S3-9話）', en: 'Ep. 59 (S3-E9)' }, sub: { ja: '混戦都市', en: 'City in Chaos' } },
+        { id: 'a3_10', label: { ja: '第60話（S3-10話）', en: 'Ep. 60 (S3-E10)' }, sub: { ja: '強欲攻略戦', en: 'Battle Against Greed' } },
+        { id: 'a3_11', label: { ja: '第61話（S3-11話）', en: 'Ep. 61 (S3-E11)' }, sub: { ja: 'リリアナ・マスカレード', en: 'Liliana Masquerade' } },
+        { id: 'a3_12', label: { ja: '第62話（S3-12話）', en: 'Ep. 62 (S3-E12)' }, sub: { ja: 'レグルス・コルニアス', en: 'Regulus Corneas' } },
+        { id: 'a3_13', label: { ja: '第63話（S3-13話）', en: 'Ep. 63 (S3-E13)' }, sub: { ja: '戦士の称賛', en: "A Warrior's Praise" } },
+        { id: 'a3_14', label: { ja: '第64話（S3-14話）', en: 'Ep. 64 (S3-E14)' }, sub: { ja: 'テレシア・ヴァン・アストレア', en: 'Theresia van Astrea' } },
+        { id: 'a3_15', label: { ja: '第65話（S3-15話）', en: 'Ep. 65 (S3-E15)' }, sub: { ja: '醜悪なる晩餐会', en: 'The Hideous Dinner Party' } },
+        { id: 'a3_16', label: { ja: '第66話（S3-16話）', en: 'Ep. 66 (S3-E16)' }, sub: { ja: 'プリステラ攻防戦リザルト', en: 'The Result of the Battle for Pristella' } },
       ]},
       { id: 'a_s4', title: { ja: '第4期（放送中）', en: 'Season 4 (Airing)' }, icon: '✨', items: [
-        { id: 'a4_01', label: '第67話（S4-1話）', sub: '君を連れ出す理由／ゴージャス・タイガー・リローデッド' },
-        { id: 'a4_02', label: '第68話（S4-2話）', sub: '砂時間を越えろ' },
-        { id: 'a4_03', label: '第69話（S4-3話）', sub: '監視塔の番人' },
-        { id: 'a4_04', label: '第70話（S4-4話）', sub: '白い星空のアステリズム' },
-        { id: 'a4_05', label: '第71話（S4-5話）', sub: '棒振り' },
-        { id: 'a4_06', label: '第72話（S4-6話）', sub: 'ユリウス・ユークリウス' },
-        { id: 'a4_07', label: '第73話（S4-7話）', sub: 'コンビニを出ると、そこは不思議の世界でした' },
-        { id: 'a4_08', label: '第74話（S4-8話）', sub: 'オマエハダレダ' },
-        { id: 'a4_09', label: '第75話（S4-9話）', sub: '残骸' },
+        { id: 'a4_01', label: { ja: '第67話（S4-1話）', en: 'Ep. 67 (S4-E1)' }, sub: { ja: '君を連れ出す理由／ゴージャス・タイガー・リローデッド', en: 'The Reason to Take You Away / Gorgeous Tiger Reloaded' } },
+        { id: 'a4_02', label: { ja: '第68話（S4-2話）', en: 'Ep. 68 (S4-E2)' }, sub: { ja: '砂時間を越えろ', en: 'Overcome the Hourglass' } },
+        { id: 'a4_03', label: { ja: '第69話（S4-3話）', en: 'Ep. 69 (S4-E3)' }, sub: { ja: '監視塔の番人', en: 'The Guardian of the Watchtower' } },
+        { id: 'a4_04', label: { ja: '第70話（S4-4話）', en: 'Ep. 70 (S4-E4)' }, sub: { ja: '白い星空のアステリズム', en: 'Asterism in the White Starry Sky' } },
+        { id: 'a4_05', label: { ja: '第71話（S4-5話）', en: 'Ep. 71 (S4-E5)' }, sub: { ja: '棒振り', en: 'Stick Swinger' } },
+        { id: 'a4_06', label: { ja: '第72話（S4-6話）', en: 'Ep. 72 (S4-E6)' }, sub: { ja: 'ユリウス・ユークリウス', en: 'Julius Juukulius' } },
+        { id: 'a4_07', label: { ja: '第73話（S4-7話）', en: 'Ep. 73 (S4-E7)' }, sub: { ja: 'コンビニを出ると、そこは不思議の世界でした', en: 'When I Left the Convenience Store, It Was a Wondrous World' } },
+        { id: 'a4_08', label: { ja: '第74話（S4-8話）', en: 'Ep. 74 (S4-E8)' }, sub: { ja: 'オマエハダレダ', en: 'Who Are You?' } },
+        { id: 'a4_09', label: { ja: '第75話（S4-9話）', en: 'Ep. 75 (S4-E9)' }, sub: { ja: '残骸', en: 'Remains' } },
+      ]},
+      { id: 'kyukei', title: { ja: 'Re:ゼロから始める休憩時間', en: 'Re:Zero Break Time' }, icon: '☕', items: [
+        { id: 'ky1', label: { ja: '1st season', en: '1st Season' }, sub: '' },
+        { id: 'ky2', label: { ja: '2nd season', en: '2nd Season' }, sub: '' },
+        { id: 'ky3', label: { ja: '3rd season', en: '3rd Season' }, sub: '' },
+        { id: 'ky4', label: { ja: '4th season', en: '4th Season' }, sub: '' },
       ]},
       { id: 'a_ova', title: { ja: 'OVA・特別編', en: 'OVA / Specials' }, icon: '🎞️', items: [
-        { id: 'ova002', label: '氷結の絆', sub: '2019年 劇場OVA' },
+        { id: 'a_ova_ms', label: { ja: 'Memory Snow', en: 'Memory Snow (OVA)' }, sub: { ja: '劇場版OVA 2018年', en: 'OVA Film 2018' } },
+        { id: 'ova002', label: { ja: '氷結の絆', en: 'The Frozen Bond' }, sub: { ja: '劇場版OVA 2019年', en: 'OVA Film 2019' } },
       ]},
       { id: 'a_isekai', title: { ja: '異世界かるてっと', en: 'Isekai Quartet' }, icon: '🎭', items: [
-        { id: 'ik001', label: '異世界かるてっと Season1', sub: '全12話' },
-        { id: 'ik002', label: '異世界かるてっと Season2', sub: '全12話' },
-        { id: 'ik003', label: '異世界かるてっと Season3', sub: '全12話' },
-        { id: 'ik004', label: '異世界かるてっと 〜アナザーワールド〜', sub: '劇場版' },
+        { id: 'ik001', label: { ja: '異世界かるてっと Season1', en: 'Isekai Quartet Season 1' }, sub: { ja: '全12話', en: '12 episodes' } },
+        { id: 'ik002', label: { ja: '異世界かるてっと Season2', en: 'Isekai Quartet Season 2' }, sub: { ja: '全12話', en: '12 episodes' } },
+        { id: 'ik003', label: { ja: '異世界かるてっと Season3', en: 'Isekai Quartet Season 3' }, sub: { ja: '全12話', en: '12 episodes' } },
+        { id: 'ik004', label: { ja: '異世界かるてっと 〜アナザーワールド〜', en: 'Isekai Quartet: Another World (Film)' }, sub: { ja: '劇場版', en: 'Movie' } },
       ]},
     ]
   },
@@ -837,23 +831,23 @@ const TABS = [
     id: 'game',
     sections: [
       { id: 'g_nazo', title: { ja: '謎解きゲーム', en: 'Puzzle Games' }, icon: '🔍', items: [
-        { id: 'g_nazo1', label: '謎解きゲーム エミリアの徽章を取り戻せ！', sub: '' },
-        { id: 'g_nazo2', label: '謎解きゲーム 迷いの街の摩訶不思議', sub: '' },
-        { id: 'g_nazo3', label: '謎ファイル', sub: '' },
+        { id: 'g_nazo1', label: { ja: '謎解きゲーム エミリアの徽章を取り戻せ！', en: "Escape Game: Recover Emilia\'s Badge!" }, sub: '' },
+        { id: 'g_nazo2', label: { ja: '謎解きゲーム 迷いの街の摩訶不思議', en: 'Escape Game: Mystery of the Labyrinth City' }, sub: '' },
+        { id: 'g_nazo3', label: { ja: '謎ファイル', en: 'Mystery File' }, sub: '' },
       ]},
       { id: 'g_console', title: { ja: 'コンシューマゲーム', en: 'Console Games' }, icon: '🕹️', items: [
-        { id: 'g_con1', label: '-DEATH OR KISS-', sub: '2017年 PS4/PSVita' },
-        { id: 'g_con2', label: '偽りの王選候補', sub: 'The Prophecy of the Throne 2021年 PS4/Switch/PC' },
+        { id: 'g_con1', label: { ja: '-DEATH OR KISS-', en: '-DEATH OR KISS-' }, sub: ''},
+        { id: 'g_con2', label: { ja: '偽りの王選候補', en: 'The Prophecy of the Throne' }, sub: ''},
       ]},
       { id: 'g_sp', title: { ja: 'スマートフォン', en: 'Mobile Games' }, icon: '📱', items: [
-        { id: 'g_sp1', label: 'リゼロパズルコレクション', sub: '' },
-        { id: 'g_sp2', label: '-infinity-', sub: '' },
-        { id: 'g_sp3', label: 'Lost in Memories', sub: '（サービス終了）' },
-        { id: 'g_sp4', label: "Witch's Re:surrection", sub: '' },
+        { id: 'g_sp1', label: { ja: 'リゼロパズルコレクション', en: 'Re:Zero Puzzle Collection' }, sub: '' },
+        { id: 'g_sp2', label: { ja: '-infinity-', en: '-infinity-' }, sub: '' },
+        { id: 'g_sp3', label: { ja: 'Lost in Memories', en: 'Lost in Memories' }, sub: '' },
+        { id: 'g_sp4', label: { ja: "Witch's Re:surrection", en: "Witch's Re:surrection" }, sub: '' },
       ]},
       { id: 'g_other', title: { ja: 'その他', en: 'Others' }, icon: '🎲', items: [
-        { id: 'g_other1', label: '禁書と謎の精霊', sub: '' },
-        { id: 'g_other2', label: 'TRicK GEAR -Re:ゼロから始まる異世界生活-', sub: '' },
+        { id: 'g_other1', label: { ja: '禁書と謎の精霊', en: 'The Forbidden Book and the Mysterious Spirit' }, sub: '' },
+        { id: 'g_other2', label: { ja: 'TRicK GEAR -Re:ゼロから始まる異世界生活-', en: 'TRicK GEAR -Re:Zero Starting Life in Another World-' }, sub: '' },
       ]},
     ]
   },
@@ -967,12 +961,12 @@ function buildUI() {
         const wrap = document.createElement('div');
         const lbl = document.createElement('span');
         lbl.className = 'check-label';
-        lbl.textContent = item.label;
+        lbl.textContent = typeof item.label === 'object' ? item.label[currentLang] || item.label.ja : item.label;
         wrap.appendChild(lbl);
         if (item.sub) {
           const sub = document.createElement('span');
           sub.className = 'check-sublabel';
-          sub.textContent = item.sub;
+          sub.textContent = typeof item.sub === 'object' ? item.sub[currentLang] || item.sub.ja : item.sub;
           wrap.appendChild(sub);
         }
 
@@ -1067,292 +1061,299 @@ function getCategoryStats() {
   return result;
 }
 
-function generateShareCanvas() {
+async function generateShareCanvas() {
+  await document.fonts.ready;
   const canvas = document.getElementById('share-canvas');
   const W = 1200, H = 630;
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
-  // ── 背景：ラベンダーグラデーション ──
+  // ── 背景グラデーション（ピンク→ラベンダー→ライトパープル）
   const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#e2ccf5');
-  bg.addColorStop(0.5, '#edd8fa');
-  bg.addColorStop(1, '#f5e2f8');
+  bg.addColorStop(0,   '#fce4ec');
+  bg.addColorStop(0.3, '#f3e5f5');
+  bg.addColorStop(0.7, '#ede7f6');
+  bg.addColorStop(1,   '#e8eaf6');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  // ── ドット柄オーバーレイ ──
-  ctx.fillStyle = 'rgba(255,255,255,0.18)';
-  for (let row = 0; row < 20; row++) {
-    for (let col = 0; col < 30; col++) {
-      ctx.beginPath();
-      ctx.arc(col * 44 + (row % 2 === 0 ? 0 : 22), row * 36, 5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  }
-
-  // ── オレンジ斜線（太いリボン）──
-  function drawStripe(ctx, x1, y1, x2, y2, width, color) {
+  // ── ボケ（水彩風のグロウ円）
+  function bokeh(cx, cy, r, color) {
     ctx.save();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = width;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
+    ctx.filter = 'blur(' + Math.floor(r * 0.55) + 'px)';
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    g.addColorStop(0, color);
+    g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+    ctx.filter = 'none';
     ctx.restore();
   }
-  // オレンジリボン群（左下→右上）
-  drawStripe(ctx, -80, 520, 480, -80, 130, 'rgba(255,160,50,0.75)');
-  drawStripe(ctx, 60, 650, 600, 40, 70, 'rgba(255,140,30,0.55)');
-  drawStripe(ctx, 200, 680, 700, 80, 40, 'rgba(255,170,60,0.4)');
-  // 右上オレンジ
-  drawStripe(ctx, 700, -50, 1300, 400, 120, 'rgba(255,160,50,0.65)');
-  drawStripe(ctx, 850, -80, 1350, 350, 60, 'rgba(255,145,35,0.45)');
+  bokeh(120,  80,  220, 'rgba(255,182,193,0.55)');
+  bokeh(1080, 100, 200, 'rgba(206,147,216,0.45)');
+  bokeh(200,  500, 180, 'rgba(179,157,219,0.4)');
+  bokeh(950,  480, 210, 'rgba(255,204,224,0.5)');
+  bokeh(600,  200, 160, 'rgba(240,196,240,0.35)');
+  bokeh(400,  580, 150, 'rgba(199,179,234,0.38)');
 
-  // ── 紫アクセント斜線 ──
-  drawStripe(ctx, -50, 380, 300, -50, 55, 'rgba(160,80,230,0.45)');
-  drawStripe(ctx, 1000, 680, 1300, 200, 80, 'rgba(140,70,210,0.38)');
-
-  // ── 白い4pointed星（スパークル）──
-  function draw4Star(ctx, cx, cy, size, alpha) {
-    ctx.save();
-    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-    ctx.shadowBlur = size * 1.5;
-    ctx.shadowColor = `rgba(255,255,255,${alpha * 0.8})`;
-    ctx.translate(cx, cy);
-    const arms = 4;
-    ctx.beginPath();
-    for (let i = 0; i < arms * 2; i++) {
-      const ang = (Math.PI * 2 / (arms * 2)) * i - Math.PI / 2;
-      const r = i % 2 === 0 ? size : size * 0.15;
-      if (i === 0) ctx.moveTo(Math.cos(ang) * r, Math.sin(ang) * r);
-      else ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r);
-    }
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-  const stars = [
-    [490, 60, 38, 0.95], [300, 140, 22, 0.85], [600, 30, 16, 0.8],
-    [80, 200, 28, 0.9], [150, 80, 14, 0.75], [1060, 80, 32, 0.9],
-    [920, 170, 18, 0.8], [1140, 250, 24, 0.85], [50, 450, 20, 0.8],
-    [1080, 520, 30, 0.9], [700, 580, 16, 0.75], [380, 570, 20, 0.8],
-    [820, 40, 14, 0.7], [180, 540, 12, 0.7],
+  // ── ゴールド星座ライン（右上に）
+  ctx.save();
+  ctx.strokeStyle = 'rgba(218,165,32,0.4)';
+  ctx.lineWidth = 1.2;
+  const constLines = [
+    [820,40, 920,90],[920,90,980,60],[980,60,1060,110],
+    [920,90,880,160],[880,160,940,200],[940,200,1010,180],
+    [1060,110,1100,160],[1100,160,1050,220],
+    [1100,160,1160,130],
   ];
-  stars.forEach(([x, y, s, a]) => draw4Star(ctx, x, y, s, a));
-
-  // ── 中央白カード ──
-  const cX = W / 2, cY = H / 2 + 20;
-  const cW = 820, cH = 420;
-  ctx.save();
-  ctx.shadowBlur = 40;
-  ctx.shadowColor = 'rgba(160,80,230,0.2)';
-  ctx.fillStyle = 'rgba(255,255,255,0.72)';
-  ctx.beginPath();
-  ctx.roundRect(cX - cW/2, cY - cH/2, cW, cH, 28);
-  ctx.fill();
+  constLines.forEach(([x1,y1,x2,y2]) => {
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  });
   ctx.restore();
 
-  // カード縁
+  // ── ゴールド星（星座の頂点）
+  function goldStar(cx, cy, r) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(218,165,32,0.85)';
+    ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(218,165,32,0.6)';
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  [[820,40,4],[920,90,5],[980,60,3.5],[1060,110,4],[880,160,3],
+   [940,200,4.5],[1010,180,3],[1100,160,5],[1160,130,3.5],[1050,220,3]
+  ].forEach(([x,y,r]) => goldStar(x,y,r));
+
+  // ── 白い4pointed星スパークル
+  function sparkle(cx, cy, size, alpha) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+    ctx.shadowBlur = size * 2; ctx.shadowColor = `rgba(255,255,255,${alpha*0.7})`;
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const a = (Math.PI/4)*i - Math.PI/2;
+      const r = i%2===0 ? size : size*0.12;
+      i===0 ? ctx.moveTo(Math.cos(a)*r, Math.sin(a)*r)
+             : ctx.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  [[100,140,18,0.9],[60,300,12,0.75],[200,60,14,0.8],[350,580,16,0.85],
+   [500,50,10,0.7],[680,580,14,0.8],[760,40,18,0.9],[150,500,10,0.7],
+   [1140,380,14,0.8],[50,450,8,0.65],[440,600,10,0.7]
+  ].forEach(([x,y,s,a]) => sparkle(x,y,s,a));
+
+  // ── 小さな星くず
+  const rng = s => { let x = Math.sin(s)*43758; return x-Math.floor(x); };
+  for (let i=0; i<120; i++) {
+    const x = rng(i*3.1)*W, y = rng(i*7.9)*H;
+    const r = rng(i*1.7)*1.5+0.3, a = rng(i*5.3)*0.5+0.15;
+    ctx.fillStyle = `rgba(255,255,255,${a})`;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
+
+  // ── 中央白カード（大きめ）
+  const cX=W/2, cY=H/2+15, cW=960, cH=500;
   ctx.save();
-  ctx.strokeStyle = 'rgba(200,160,240,0.6)';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.roundRect(cX - cW/2, cY - cH/2, cW, cH, 28);
-  ctx.stroke();
+  ctx.shadowBlur = 50; ctx.shadowColor = 'rgba(180,120,220,0.2)';
+  const cg = ctx.createLinearGradient(cX-cW/2, cY-cH/2, cX+cW/2, cY+cH/2);
+  cg.addColorStop(0, 'rgba(255,255,255,0.82)');
+  cg.addColorStop(1, 'rgba(248,240,255,0.75)');
+  ctx.fillStyle = cg;
+  ctx.beginPath(); ctx.roundRect(cX-cW/2, cY-cH/2, cW, cH, 32); ctx.fill();
+  ctx.restore();
+  // カード枠
+  ctx.save();
+  const eg = ctx.createLinearGradient(cX-cW/2, cY-cH/2, cX+cW/2, cY+cH/2);
+  eg.addColorStop(0, 'rgba(236,156,196,0.6)');
+  eg.addColorStop(0.5,'rgba(186,104,200,0.4)');
+  eg.addColorStop(1, 'rgba(156,136,216,0.5)');
+  ctx.strokeStyle = eg; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(cX-cW/2, cY-cH/2, cW, cH, 32); ctx.stroke();
   ctx.restore();
 
-  // ── 上部タイトルエリア ──
-  // 「リゼロ」大文字
+  // ── タイトル（2行レイアウト）
+  const L = currentLang === 'en';
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = 'bold 82px "Arial Rounded MT Bold", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif';
-  // 白縁取り
-  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
-  ctx.lineWidth = 10;
-  ctx.lineJoin = 'round';
-  ctx.strokeText('リゼロ', cX, 120);
-  // 紫文字
-  const tGrad = ctx.createLinearGradient(cX - 200, 60, cX + 200, 130);
-  tGrad.addColorStop(0, '#a040e0');
-  tGrad.addColorStop(1, '#7020b0');
-  ctx.fillStyle = tGrad;
-  ctx.shadowBlur = 10;
-  ctx.shadowColor = 'rgba(160,60,220,0.4)';
-  ctx.fillText('リゼロ', cX, 120);
+  // 1行目
+  const line1 = L ? 'Re:ZERO -Starting Life in Another World-' : 'Re:ゼロから始める異世界生活';
+  ctx.font = 'bold 36px "Noto Sans JP","Hiragino Sans","Meiryo",sans-serif';
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 8; ctx.lineJoin = 'round';
+  ctx.strokeText(line1, cX, cY-210);
+  const tg1 = ctx.createLinearGradient(cX-300,0,cX+300,0);
+  tg1.addColorStop(0,'#d05090'); tg1.addColorStop(0.5,'#9c27b0'); tg1.addColorStop(1,'#7040c0');
+  ctx.fillStyle = tg1;
+  ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(160,60,180,0.4)';
+  ctx.fillText(line1, cX, cY-210);
+  // 2行目
+  const line2 = L ? 'Checklist' : '既読・視聴チェックリスト';
+  ctx.font = 'bold 28px "Noto Sans JP","Hiragino Sans","Meiryo",sans-serif';
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 6;
+  ctx.strokeText(line2, cX, cY-165);
+  const tg2 = ctx.createLinearGradient(cX-200,0,cX+200,0);
+  tg2.addColorStop(0,'#b050a0'); tg2.addColorStop(1,'#8040b0');
+  ctx.fillStyle = tg2; ctx.shadowBlur = 6;
+  ctx.fillText(line2, cX, cY-165);
   ctx.restore();
 
-  // サブタイトル
+  // 区切りライン（ゴールド）
   ctx.save();
-  ctx.textAlign = 'center';
-  ctx.font = 'bold 17px "Hiragino Sans", sans-serif';
-  ctx.strokeStyle = 'rgba(255,255,255,0.9)';
-  ctx.lineWidth = 4;
-  ctx.lineJoin = 'round';
-  ctx.strokeText('-STARTING LIFE IN ANOTHER WORLD-', cX, 152);
-  ctx.fillStyle = '#8020c0';
-  ctx.fillText('-STARTING LIFE IN ANOTHER WORLD-', cX, 152);
+  ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(218,165,32,0.5)';
+  const lg = ctx.createLinearGradient(cX-420,0,cX+420,0);
+  lg.addColorStop(0,'transparent');
+  lg.addColorStop(0.15,'rgba(218,165,32,0.6)');
+  lg.addColorStop(0.85,'rgba(218,165,32,0.6)');
+  lg.addColorStop(1,'transparent');
+  ctx.strokeStyle = lg; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(cX-420,cY-135); ctx.lineTo(cX+420,cY-135); ctx.stroke();
   ctx.restore();
 
-  // ── 達成率 ──
+  // ── コンプリート率
   const done  = parseInt(document.getElementById('global-done').textContent)  || 0;
   const total = parseInt(document.getElementById('global-total').textContent) || 0;
-  const pct   = total ? Math.round(done / total * 100) : 0;
+  const pct   = total ? Math.round(done/total*100) : 0;
 
-  // 「コンプリート率」ラベル
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = '20px "Hiragino Sans", sans-serif';
-  ctx.fillStyle = '#9030d0';
-  ctx.fillText(currentLang === 'en' ? 'Completion Rate' : 'コンプリート率', cX, cY - 130);
+  ctx.font = '20px "Noto Sans JP","Hiragino Sans",sans-serif';
+  ctx.fillStyle = '#9c3fb0';
+  ctx.fillText(L ? 'Your Completion Rate' : 'コンプリート率', cX, cY-100);
   ctx.restore();
 
-  // 大きな % 数字
+  // 大きな%数字
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = 'bold 110px "Arial Rounded MT Bold", "Hiragino Maru Gothic ProN", sans-serif';
-  ctx.strokeStyle = 'rgba(255,255,255,0.95)';
-  ctx.lineWidth = 12;
-  ctx.lineJoin = 'round';
-  ctx.strokeText(pct + '%', cX, cY - 20);
-  const pGrad = ctx.createLinearGradient(cX - 100, cY - 130, cX + 100, cY - 20);
-  pGrad.addColorStop(0, '#c060f0');
-  pGrad.addColorStop(0.5, '#9030d0');
-  pGrad.addColorStop(1, '#6010a0');
-  ctx.fillStyle = pGrad;
-  ctx.shadowBlur = 20;
-  ctx.shadowColor = 'rgba(160,60,220,0.35)';
-  ctx.fillText(pct + '%', cX, cY - 20);
+  ctx.font = 'bold 108px "Noto Sans JP","Hiragino Sans",sans-serif';
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 14; ctx.lineJoin = 'round';
+  ctx.strokeText(pct+'%', cX, cY+10);
+  const pg = ctx.createLinearGradient(cX-120,cY-90,cX+120,cY+10);
+  pg.addColorStop(0,'#d060a0'); pg.addColorStop(0.5,'#9c27b0'); pg.addColorStop(1,'#6030b0');
+  ctx.fillStyle = pg; ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(180,60,200,0.4)';
+  ctx.fillText(pct+'%', cX, cY+10);
   ctx.restore();
 
-  // 達成数
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = 'bold 18px "Hiragino Sans", sans-serif';
-  ctx.fillStyle = '#8028b8';
-  ctx.fillText('★ ' + done + ' / ' + total + (currentLang === 'en' ? ' items' : ' 項目達成') + ' ★', cX, cY + 20);
+  ctx.font = 'bold 18px "Noto Sans JP","Hiragino Sans",sans-serif';
+  ctx.fillStyle = '#9040b8';
+  ctx.fillText('★ '+done+' / '+total+(L ? ' items achieved' : ' 項目達成')+'  ★', cX, cY+48);
   ctx.restore();
 
-  // ── カテゴリ別バー ──
+  // ── カテゴリ別バー（2列）
   const cats = getCategoryStats();
-  const cols = 2;
-  const rows = Math.ceil(cats.length / cols);
-  const bTop = cY + 45;
-  const bH = 16;
-  const colWide = (cW - 60) / cols;
-  const barColors = ['#c060f0','#f06090','#60b0f0','#f09030','#60d090','#f060c0','#9090f0'];
+  const cols = 2, rowH = 38;
+  const bTop = cY + 95;
+  const colW = (cW-60)/cols;
+  const barColors=['#d060b0','#8060d0','#60a0e0','#e08040','#50c090','#e06080'];
 
-  cats.forEach((cat, i) => {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    const xBase = cX - cW/2 + 30 + col * colWide;
-    const yBase = bTop + row * (bH + 22) + bH;
-    const bW = colWide - 20;
-    const color = barColors[i % barColors.length];
+  cats.forEach((cat,i) => {
+    const col=i%cols, row=Math.floor(i/cols);
+    const xB = cX-cW/2+30+col*colW;
+    const yB = bTop+row*rowH;
+    const bW = colW-22, bH = 14;
 
-    // ラベル
     ctx.save();
-    ctx.fillStyle = '#6a1b9a';
-    ctx.font = '13px "Hiragino Sans", sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText(cat.label, xBase, yBase - 3);
-    // %
-    ctx.textAlign = 'right';
-    ctx.font = 'bold 13px "Hiragino Sans", sans-serif';
-    ctx.fillStyle = '#9030d0';
-    ctx.fillText(cat.pct + '%', xBase + bW, yBase - 3);
+    ctx.fillStyle = '#7030a0';
+    ctx.font = '12px "Noto Sans JP","Hiragino Sans",sans-serif';
+    ctx.textAlign = 'left'; ctx.fillText(cat.label, xB, yB+11);
+    ctx.font = 'bold 12px "Hiragino Sans",sans-serif';
+    ctx.textAlign = 'right'; ctx.fillStyle = '#9030b0';
+    ctx.fillText(cat.pct+'%', xB+bW, yB+11);
     ctx.restore();
 
-    // バー背景
-    ctx.fillStyle = 'rgba(200,160,230,0.25)';
-    ctx.beginPath();
-    ctx.roundRect(xBase, yBase + 1, bW, bH, bH/2);
-    ctx.fill();
+    ctx.fillStyle = 'rgba(180,120,220,0.2)';
+    ctx.beginPath(); ctx.roundRect(xB,yB+15,bW,bH,bH/2); ctx.fill();
 
-    // バー
-    if (cat.pct > 0) {
-      const fw = Math.max(bW * cat.pct / 100, bH);
-      const bg2 = ctx.createLinearGradient(xBase, 0, xBase + fw, 0);
-      bg2.addColorStop(0, color + 'bb');
-      bg2.addColorStop(1, color + '77');
-      ctx.save();
-      ctx.fillStyle = bg2;
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = color + '66';
-      ctx.beginPath();
-      ctx.roundRect(xBase, yBase + 1, fw, bH, bH/2);
-      ctx.fill();
+    if (cat.pct>0) {
+      const fw = Math.max(bW*cat.pct/100,bH);
+      const c = barColors[i%barColors.length];
+      const fbg = ctx.createLinearGradient(xB,0,xB+fw,0);
+      fbg.addColorStop(0,c+'bb'); fbg.addColorStop(1,c+'66');
+      ctx.save(); ctx.fillStyle=fbg;
+      ctx.shadowBlur=5; ctx.shadowColor=c+'55';
+      ctx.beginPath(); ctx.roundRect(xB,yB+15,fw,bH,bH/2); ctx.fill();
       ctx.restore();
     }
   });
 
-  // ── 下部：URL＋ハッシュタグ ──
+  // ── 日付表示
+  const now = new Date();
+  const dateStr = currentLang === 'en'
+    ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][now.getMonth()]
+      + ' ' + now.getDate() + ', ' + now.getFullYear()
+    : (now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日');
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = '13px sans-serif';
-  ctx.fillStyle = 'rgba(120,60,180,0.65)';
-  const shortUrl = location.href.length > 55 ? location.href.slice(0, 52) + '...' : location.href;
-  ctx.fillText('🔗 ' + shortUrl + '  #リゼロ #rezero', cX, H - 18);
+  ctx.font = '15px "Noto Sans JP","Hiragino Sans",sans-serif';
+  ctx.fillStyle = 'rgba(140,80,180,0.7)';
+  ctx.fillText('📅 ' + dateStr, cX, cY + 70);
   ctx.restore();
 
   return canvas;
 }
-function shareToX() {
-  const canvas = generateShareCanvas();
+async function shareToX() {
+  const canvas = await generateShareCanvas();
   const preview = document.getElementById('share-canvas-preview');
   preview.src = canvas.toDataURL('image/png');
 
   const done  = document.getElementById('global-done').textContent;
   const total = document.getElementById('global-total').textContent;
-  const pct   = total > 0 ? Math.round(parseInt(done) / parseInt(total) * 100) : 0;
-  const tweetBody = currentLang === 'en'
-    ? 'Re:Zero Checklist ' + pct + '% complete (' + done + '/' + total + ')\n'
-    : 'リゼロ既読チェック ' + pct + '%達成（' + done + '/' + total + '）\n';
-  const tweetText = tweetBody + location.href + '\n#リゼロ #rezero';
+  const pct   = total>0 ? Math.round(parseInt(done)/parseInt(total)*100) : 0;
+  const L = currentLang==='en';
+  const tweetText = (L
+    ? 'Re:Zero Checklist '+pct+'% complete ('+done+'/'+total+')\n'
+    : 'リゼロ既読チェック '+pct+'%達成（'+done+'/'+total+'）\n')
+    + location.href + '\n#リゼロ #rezero';
 
   // ダウンロードボタン
   const dlBtn = document.getElementById('modal-btn-dl');
-  if (dlBtn) {
-    dlBtn.onclick = () => {
-      const a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
-      a.download = 'rezero_checklist.png';
-      a.click();
-    };
-  }
+  if (dlBtn) dlBtn.onclick = () => {
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'rezero_checklist.png'; a.click();
+  };
 
-  // Xで投稿ボタン（モバイル: Web Share API / デスクトップ: 画像DL+X intent）
+  // Xで投稿ボタン
   const xBtn = document.getElementById('share-modal-xbtn');
-  if (xBtn) {
-    xBtn.onclick = async () => {
-      // モバイルでWeb Share API（ファイル共有）を試みる
-      canvas.toBlob(async (blob) => {
-        const file = new File([blob], 'rezero_checklist.png', { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({ files: [file], text: tweetText, title: 'リゼロ既読チェックリスト' });
-            return;
-          } catch (e) { /* fallthrough */ }
-        }
-        // フォールバック：画像DL + クリップボードコピー + X を開く
-        const a = document.createElement('a');
-        a.href = canvas.toDataURL('image/png');
-        a.download = 'rezero_checklist.png';
-        a.click();
-        if (navigator.clipboard) {
-          await navigator.clipboard.writeText(tweetText).catch(() => {});
-        }
-        setTimeout(() => {
-          window.open('https://x.com/intent/tweet?text=' + encodeURIComponent(tweetText), '_blank');
-          showToast(currentLang === 'en'
-            ? '📥 Image downloaded! Attach it to your tweet ✨'
-            : '📥 画像をダウンロードしました！ツイートに添付してください ✨');
-        }, 600);
-      });
-    };
-  }
+  if (xBtn) xBtn.onclick = async () => {
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], 'rezero_checklist.png', {type:'image/png'});
+
+      // ① スマホ: Web Share API (ファイル添付)
+      if (navigator.canShare && navigator.canShare({files:[file]})) {
+        try {
+          await navigator.share({files:[file], text:tweetText, title:'リゼロ既読チェックリスト'});
+          return;
+        } catch(e) { /* fallthrough */ }
+      }
+
+      // ② PC Chrome: クリップボードに画像をコピー → X を開く
+      let clipOk = false;
+      try {
+        await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+        clipOk = true;
+      } catch(e) {}
+
+      // X intent を開く（テキストのみ）
+      window.open('https://x.com/intent/tweet?text='+encodeURIComponent(tweetText), '_blank');
+
+      // ③ 同時に画像もダウンロード（念のため）
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png'); a.download='rezero_checklist.png'; a.click();
+
+      if (clipOk) {
+        showToast(L
+          ? '📋 Image copied to clipboard! Paste it into your tweet ✨'
+          : '📋 画像をクリップボードにコピーしました！ツイートに貼り付けてください ✨');
+      } else {
+        showToast(L
+          ? '📥 Image downloaded! Attach it to your tweet on X ✨'
+          : '📥 画像をダウンロードしました！Xのツイートに添付してください ✨');
+      }
+    });
+  };
 
   document.getElementById('share-modal-overlay').classList.add('open');
 }
@@ -1379,8 +1380,8 @@ function resetAll() {
     : '全てのチェックをリセットしますか？\nこの操作は元に戻せません。';
   if (!confirm(msg)) return;
   checked.clear();
-  saveToUrl();
-  updateAll();
+  saveState();
+  buildUI();
   showToast(currentLang === 'en' ? 'Reset complete ✨' : 'リセットしました ✨');
 }
 
@@ -1403,17 +1404,19 @@ function copyURL() {
 
 function showToast(msg) {
   const t = document.getElementById('toast');
+  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2600);
+  setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// INIT
-if (location.hash && location.hash.length > 1) {
-  decodeState(location.hash.slice(1));
-}
-applyLang();
-buildUI();
+// ── Init ──
+(function() {
+  const hash = location.hash.slice(1);
+  if (hash) decodeState(hash);
+  applyLang();
+  buildUI();
+})();
 </script>
 </body>
-</html>
+</html>                                                                                                                                                                     
