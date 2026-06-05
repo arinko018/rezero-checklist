@@ -1,106 +1,132 @@
-const Jimp = require('jimp');
+const path = require('path');
+const fs   = require('fs');
+const { Resvg } = require('@resvg/resvg-js');
+
+// @fontsource/noto-sans-jp のWOFFファイルをnode_modulesから読む
+// fontkit(satoriが使用)はWOFF形式をサポートしている
+function loadFont() {
+  const candidates = [
+    // japanese サブセット（日本語文字のみ・軽量）
+    path.join(process.cwd(), 'node_modules', '@fontsource', 'noto-sans-jp', 'files', 'noto-sans-jp-japanese-400-normal.woff'),
+    // all（全文字収録・確実だが重い）
+    path.join(process.cwd(), 'node_modules', '@fontsource', 'noto-sans-jp', 'files', 'noto-sans-jp-all-400-normal.woff'),
+    // __dirnameからの相対パス（フォールバック）
+    path.join(__dirname, '..', '..', 'node_modules', '@fontsource', 'noto-sans-jp', 'files', 'noto-sans-jp-japanese-400-normal.woff'),
+  ];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) {
+      const size = fs.statSync(p).size;
+      console.log('Font found:', p, size + ' bytes');
+      return fs.readFileSync(p);
+    }
+  }
+  console.error('Font NOT found. Searched:', candidates);
+  return null;
+}
 
 exports.handler = async (event) => {
   const q     = event.queryStringParameters || {};
-  const pct   = parseInt(q.pct   || '0', 10);
+  const pct   = q.pct   || '0';
   const done  = q.done  || '0';
   const total = q.total || '0';
+  const lang  = q.lang  || 'ja';
+  const isEn  = lang === 'en';
 
-  const W = 1200, H = 630;
+  // ESMパッケージはdynamic importで読む
+  const { default: satori } = await import('satori');
 
-  // ── ベース画像作成（ピンク→ラベンダーグラデーション） ──
-  const image = new Jimp(W, H);
-
-  image.scan(0, 0, W, H, (x, y, idx) => {
-    const t = x / W;
-    image.bitmap.data[idx]   = Math.round(252 - t * 44);
-    image.bitmap.data[idx+1] = Math.round(228 - t * 43);
-    image.bitmap.data[idx+2] = Math.round(236 + t * 14);
-    image.bitmap.data[idx+3] = 255;
-  });
-
-  // ── ボケ装飾円 ──
-  const drawCircle = (cx, cy, r, cr, cg, cb) => {
-    image.scan(
-      Math.max(0, cx-r), Math.max(0, cy-r),
-      Math.min(W, cx+r) - Math.max(0, cx-r),
-      Math.min(H, cy+r) - Math.max(0, cy-r),
-      (x, y, idx) => {
-        const dist = Math.sqrt((x-cx)**2 + (y-cy)**2);
-        if (dist < r) {
-          const a = 0.5 * (1 - dist/r);
-          image.bitmap.data[idx]   = Math.min(255, Math.round(image.bitmap.data[idx]   * (1-a) + cr * a));
-          image.bitmap.data[idx+1] = Math.min(255, Math.round(image.bitmap.data[idx+1] * (1-a) + cg * a));
-          image.bitmap.data[idx+2] = Math.min(255, Math.round(image.bitmap.data[idx+2] * (1-a) + cb * a));
-        }
-      }
-    );
-  };
-  drawCircle(100,  80, 200, 255, 182, 193);
-  drawCircle(1100, 550, 180, 206, 147, 216);
-  drawCircle(1000,  70, 150, 255, 204, 224);
-
-  // ── 白いカード ──
-  image.scan(40, 30, 1120, 570, (x, y, idx) => {
-    const a = 0.86;
-    image.bitmap.data[idx]   = Math.min(255, Math.round(image.bitmap.data[idx]   * (1-a) + 255 * a));
-    image.bitmap.data[idx+1] = Math.min(255, Math.round(image.bitmap.data[idx+1] * (1-a) + 255 * a));
-    image.bitmap.data[idx+2] = Math.min(255, Math.round(image.bitmap.data[idx+2] * (1-a) + 255 * a));
-  });
-
-  // ── ゴールド区切り線 ──
-  const drawLine = (y1) => {
-    image.scan(80, y1, 1040, 2, (x, y, idx) => {
-      image.bitmap.data[idx]   = 218;
-      image.bitmap.data[idx+1] = 165;
-      image.bitmap.data[idx+2] = 32;
-      image.bitmap.data[idx+3] = 200;
-    });
-  };
-  drawLine(172);
-  drawLine(460);
-
-  // ── 進捗バー ──
-  image.scan(120, 490, 960, 26, (x, y, idx) => {
-    image.bitmap.data[idx] = 220; image.bitmap.data[idx+1] = 190; image.bitmap.data[idx+2] = 240;
-  });
-  const fillW = Math.round(960 * pct / 100);
-  if (fillW > 0) {
-    image.scan(120, 490, fillW, 26, (x, y, idx) => {
-      const t = (x - 120) / 960;
-      image.bitmap.data[idx]   = Math.round(208 - t * 80);
-      image.bitmap.data[idx+1] = Math.round(48  + t * 10);
-      image.bitmap.data[idx+2] = Math.round(176 - t * 50);
-    });
+  const fontData = loadFont();
+  if (!fontData) {
+    return { statusCode: 500, body: 'Font not found. Check @fontsource/noto-sans-jp is installed.' };
   }
 
-  // ── フォント読み込み（jimp内蔵ビットマップフォント） ──
-  const [f64, f32, f16] = await Promise.all([
-    Jimp.loadFont(Jimp.FONT_SANS_64_BLACK),
-    Jimp.loadFont(Jimp.FONT_SANS_32_BLACK),
-    Jimp.loadFont(Jimp.FONT_SANS_16_BLACK),
-  ]);
+  // 言語切り替えテキスト
+  const title   = isEn ? 'Re:ZERO - Starting Life in Another World' : 'Re:ゼロから始める異世界生活';
+  const sub     = isEn ? 'Read / Watch Checklist'                   : '既読・視聴チェックリスト';
+  const label   = isEn ? 'Completion Rate'                          : 'コンプリート率';
+  const itemsTxt = isEn ? `${done} / ${total} items`               : `${done} / ${total} 項目達成`;
+  const siteUrl = 'rezero-checklist.netlify.app';
 
-  const center = (font, y, text) =>
-    image.print(font, 0, y, { text, alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER }, W);
+  // satori用のReactライクな要素ツリー
+  const element = {
+    type: 'div',
+    props: {
+      style: {
+        width: '1200px', height: '630px',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        background: 'linear-gradient(135deg, #fce4ec 0%, #f3e5f5 50%, #e8eaf6 100%)',
+        fontFamily: '"Noto Sans JP"',
+        position: 'relative',
+      },
+      children: [
+        // ボケ装飾
+        { type:'div', props:{ style:{ position:'absolute', top:-60, left:-40, width:280, height:280, borderRadius:'50%', background:'rgba(255,182,193,0.5)' }, children:'' } },
+        { type:'div', props:{ style:{ position:'absolute', bottom:-50, right:-30, width:260, height:260, borderRadius:'50%', background:'rgba(206,147,216,0.45)' }, children:'' } },
+        { type:'div', props:{ style:{ position:'absolute', top:40, right:60, width:200, height:200, borderRadius:'50%', background:'rgba(255,204,224,0.5)' }, children:'' } },
+        // 白カード
+        {
+          type: 'div',
+          props: {
+            style: {
+              display:'flex', flexDirection:'column', alignItems:'center',
+              background:'rgba(255,255,255,0.86)',
+              border:'2px solid rgba(200,160,240,0.6)',
+              borderRadius:'28px',
+              padding:'24px 56px 28px',
+              width:'1100px',
+              gap:'4px',
+            },
+            children: [
+              // タイトル
+              { type:'div', props:{ style:{ fontSize:36, fontWeight:700, color:'#9c27b0', textAlign:'center' }, children: title } },
+              { type:'div', props:{ style:{ fontSize:22, color:'#b039c8' }, children: sub } },
+              // 区切り線
+              { type:'div', props:{ style:{ width:'100%', height:2, background:'rgba(218,165,32,0.65)', margin:'6px 0' }, children:'' } },
+              // ラベル
+              { type:'div', props:{ style:{ fontSize:24, color:'#9c3fb0' }, children: label } },
+              // 大きな%
+              { type:'div', props:{ style:{ fontSize:150, fontWeight:700, color:'#9c27b0', lineHeight:1.05 }, children: pct + '%' } },
+              // 達成数
+              { type:'div', props:{ style:{ fontSize:26, color:'#8040b8' }, children: '★ ' + itemsTxt + ' ★' } },
+              // 区切り線
+              { type:'div', props:{ style:{ width:'100%', height:1.5, background:'rgba(218,165,32,0.5)', margin:'4px 0' }, children:'' } },
+              // 進捗バー背景
+              { type:'div', props:{
+                style:{ width:'100%', height:24, background:'rgba(220,190,240,0.5)', borderRadius:12, overflow:'hidden', display:'flex', alignItems:'stretch' },
+                children: {
+                  type:'div',
+                  props:{ style:{ width: pct + '%', background:'linear-gradient(90deg,#d060a0,#7030b0)', borderRadius:12 }, children:'' }
+                }
+              }},
+              // URL
+              { type:'div', props:{ style:{ fontSize:18, color:'rgba(120,60,180,0.65)', marginTop:4 }, children: siteUrl } },
+            ],
+          },
+        },
+      ],
+    },
+  };
 
-  // タイトル
-  await center(f32,  70, 'Re:ZERO  Starting Life in Another World');
-  await center(f16, 118, 'Read / Watch Checklist');
-  // ラベル
-  await center(f32, 185, 'Completion Rate');
-  // 大きな%
-  await center(f64, 270, pct + '%');
-  // 達成数
-  await center(f32, 385, done + ' / ' + total + ' items');
-  // URL
-  await center(f16, 540, 'rezero-checklist.netlify.app');
+  const svg = await satori(element, {
+    width: 1200,
+    height: 630,
+    fonts: [{
+      name: 'Noto Sans JP',
+      data: fontData,
+      weight: 400,
+      style: 'normal',
+    }],
+  });
 
-  const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+  // satoriのSVGはテキストがパス化済み → resvgでPNG変換（フォント不要）
+  const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } });
+  const png   = resvg.render().asPng();
+
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=600' },
-    body: buffer.toString('base64'),
+    body: Buffer.from(png).toString('base64'),
     isBase64Encoded: true,
   };
 };
